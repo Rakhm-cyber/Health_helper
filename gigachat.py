@@ -6,8 +6,11 @@ from aiogram.types import Message
 
 gigachat_router = Router()
 
-# Настраиваем GigaChat
-gigachat_model = ChatGigaChat(model="gpt-3.5-turbo", api_key="ВАШ_API_КЛЮЧ")
+
+gigachat_model = ChatGigaChat(
+    model="gigachat",  # Указываем модель GigaChat
+    api_key="MWZkMmM0ZDktNDhjZS00ZWFlLWI5Y2YtZjZmZTkwNjUyMWM5OjJhYmJkOTc3LTQ3ODUtNDUyYS1iMzMxLTBlODViMDRjOTljNg=="  # Ваш API-ключ для доступа
+)
 user_conversations = {}
 
 @gigachat_router.message(commands=["chat"])
@@ -32,6 +35,4 @@ async def handle_message(message: Message):
         conversation = user_conversations[user_id]
         user_input = message.text
         response = conversation.run(user_input)
-        await message.answer(response)
-    else:
-        await message.answer("Пожалуйста, используйте /chat для начала диалога.")
+        await message.answer("Сначала начните диалог с помощью команды /chat.")

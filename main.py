@@ -5,16 +5,12 @@ from aiogram.types import BotCommand
 from hendlers import router
 from middlewares import UserActionLoggerMiddleware
 from db import db as database
-from langchain.chains import ConversationChain
-from langchain.chat_models import ChatGigaChat
-from langchain.memory import ConversationBufferMemory
-from langchain.schema import SystemMessage
-from gigachat import gigachat_router
+#from gigachat import gigachat_router
 
 telegram_bot = Bot(token="7768523863:AAFjDZwEO_kz9WrWjBQonBW7MHTs1UQJF5c")
 
 dispatcher = Dispatcher(storage=MemoryStorage())
-dispatcher.include_router(gigachat_router)
+#dispatcher.include_router(gigachat_router)
 dispatcher.include_router(router)
 dispatcher.update.middleware(UserActionLoggerMiddleware())
 
@@ -36,5 +32,8 @@ async def main():
 
     print("Бот запущен. Ожидаем сообщений...")
     await dispatcher.start_polling(telegram_bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 
   
