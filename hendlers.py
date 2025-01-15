@@ -15,7 +15,7 @@ quiz_data = [
     {
         "question": "В каком мясе больше всего белка?",
         "options": ["Курица", "Рыба", "Говядина"],
-        "correct_option": 0  # Индекс правильного ответа
+        "correct_option": 0
     },
     {
         "question": "сколько воды необходимо человеку в сутки?",
@@ -87,7 +87,13 @@ async def handle_project_info(message: types.Message):
 
 @router.message(lambda message: message.text == "Поддержка")
 async def handle_support(message: types.Message):
-    await message.answer("Свяжитесь с разработчиком: [Написать в Telegram](https://t.me/neeeeectdis)", parse_mode="Markdown")
+    await message.answer(
+        "Свяжитесь с разработчиком:\n"
+        "[Написать в Telegram (1)](https://t.me/neeeeectdis)\n"
+        "[Написать в Telegram (2)](https://t.me/veetalya)",
+        parse_mode="Markdown"
+    )
+
 
 @router.message(lambda message: message.text == "Викторина о здоровье")
 async def start_quiz(message: types.Message):
@@ -101,9 +107,6 @@ async def start_quiz(message: types.Message):
     )
 
 def generate_quiz_keyboard(question_index: int):
-    """
-    Создает inline-клавиатуру для текущего вопроса викторины.
-    """
     buttons = [
         [InlineKeyboardButton(text=option, callback_data=f"quiz_{question_index}_{i}")]
         for i, option in enumerate(quiz_data[question_index]["options"])
@@ -204,12 +207,10 @@ async def reg_seventh(message: Message, state: FSMContext):
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
 
-    # Сохраняем данные веса
     await state.update_data(weight=message.text)
 
-    # Извлекаем все данные, чтобы проверить их
     data = await state.get_data()
-    print(data)  # Лог для проверки
+    print(data)
     await save_user_data(
         db=db,
         user_id=message.from_user.id,
@@ -343,8 +344,6 @@ async def update_age(message: Message, state: FSMContext):
 
     new_age = int(message.text)
     user_id = message.from_user.id
-
-    # Обновляем возраст в базе данных
     query = "UPDATE users SET age = $1 WHERE user_id = $2"
     await db.execute(query, new_age, user_id)
 
@@ -352,21 +351,46 @@ async def update_age(message: Message, state: FSMContext):
     await state.clear()
 
 
+@router.callback_query(lambda c: c.data == "edit_height")
+async def edit_height(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите новый рост (в сантиметрах):")
+    await state.set_state(EditProfile.height)  # Устанавливаем состояние для редактирования роста
+    await callback.answer()
+
+@router.message(EditProfile.height)
+async def update_height(message: Message, state: FSMContext):
+    if not message.text.isdigit() or int(message.text) <= 0:
+        await message.answer("Пожалуйста, введите корректный рост (число).")
+        return
+
+    new_height = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET height = $1 WHERE user_id = $2"
+    await db.execute(query, new_height, user_id)
+
+    await message.answer("Ваш рост успешно обновлён.")
+    await state.clear()
 
 
 @router.callback_query(lambda c: c.data == "edit_weight")
 async def edit_weight(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите новый вес (в килограммах):")
-    await state.set_state(Registration.weight)
+    await state.set_state(EditProfile.weight)  # Устанавливаем состояние для редактирования веса
     await callback.answer()
 
-@router.message(Registration.weight)
+@router.message(EditProfile.weight)
 async def update_weight(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
-    await state.update_data(weight=message.text)
-    await message.answer("Ваш вес успешно обновлен.")
+
+    new_weight = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET weight = $1 WHERE user_id = $2"
+    await db.execute(query, new_weight, user_id)
+
+    await message.answer("Ваш вес успешно обновлён.")
+    await state.clear()
 
 
 

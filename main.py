@@ -5,13 +5,13 @@ from aiogram.types import BotCommand
 from hendlers import router
 from middlewares import UserActionLoggerMiddleware
 from db import db as database
-#from gigachat import gigachat_router
+from gigachat_hendler import gigachat_router
 
 telegram_bot = Bot(token="7768523863:AAFjDZwEO_kz9WrWjBQonBW7MHTs1UQJF5c")
 
 dispatcher = Dispatcher(storage=MemoryStorage())
-#dispatcher.include_router(gigachat_router)
 dispatcher.include_router(router)
+dispatcher.include_router(gigachat_router)
 dispatcher.update.middleware(UserActionLoggerMiddleware())
 
 
