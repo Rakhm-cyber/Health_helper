@@ -2,8 +2,7 @@ from aiogram.types import Message, CallbackQuery, TelegramObject, Update
 from aiogram import BaseMiddleware
 from typing import Callable, Dict, Any, Awaitable
 from datetime import datetime
-from db import db
-
+from db import db, if_exists
 
 class UserActionLoggerMiddleware(BaseMiddleware):
     async def __call__(
@@ -72,3 +71,33 @@ class UserActionLoggerMiddleware(BaseMiddleware):
             print(f"Успешно записано действие: {user_id}, {username}, {action_type}, {callback_data}, {timestamp}")
         except Exception as e:
             print(f"Ошибка при записи в базу данных: {e}")
+
+class UserAuthorizationMiddleware(BaseMiddleware):
+    async def __call__(
+        self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
+        event: TelegramObject,
+        data: Dict[str, Any]
+    ) -> Any:
+        if hasattr(event, 'from_user') and event.from_user:
+            user_id = event.from_user.id
+        elif hasattr(event, 'message') and event.message and event.message.from_user:
+            user_id = event.message.from_user.id
+        else:
+            if isinstance(event, Message):
+                await event.answer("Ошибка обработки события")
+            return
+            
+
+        if if_exists(db, user_id):
+            return await handler(event, data)
+        else:
+            if isinstance(event, Message):
+                await event.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
+            return
+
+
+        
+
+
+   
+

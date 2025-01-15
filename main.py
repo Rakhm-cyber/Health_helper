@@ -3,8 +3,8 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
 from hendlers import router
-from middlewares import UserActionLoggerMiddleware
-from db import db as database
+from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware
+from db import db
 #from gigachat import gigachat_router
 
 telegram_bot = Bot(token="7768523863:AAFjDZwEO_kz9WrWjBQonBW7MHTs1UQJF5c")
@@ -13,7 +13,7 @@ dispatcher = Dispatcher(storage=MemoryStorage())
 #dispatcher.include_router(gigachat_router)
 dispatcher.include_router(router)
 dispatcher.update.middleware(UserActionLoggerMiddleware())
-
+dispatcher.update.middleware(UserAuthorizationMiddleware())
 
 async def set_commands(bot: Bot):
     commands = [
@@ -26,7 +26,7 @@ async def set_commands(bot: Bot):
     await bot.set_my_commands(commands)
 
 async def main():
-    await database.connect()
+    await db.connect()
 
     await set_commands(telegram_bot)
 

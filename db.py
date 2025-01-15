@@ -1,12 +1,13 @@
 import asyncpg
+import config
 
 class Database:
-    def __init__(self, user, password, database, host, port=5432):
-        self.user = user
-        self.password = password
-        self.database = database
-        self.host = host
-        self.port = port
+    def __init__(self, cfg):
+        self.user = cfg.postgres_user
+        self.password = cfg.postgres_password
+        self.database = cfg.postgres_db
+        self.host = cfg.postgres_host
+        self.port = cfg.postgres_port
         self.pool = None
 
     async def connect(self):
@@ -29,13 +30,9 @@ class Database:
         async with self.pool.acquire() as connection:
             return await connection.fetch(query, *args)
 
+cfg = config.load()
 
-db = Database(
-    user="postgres",
-    password="1",
-    database="1",
-    host="localhost"
-)
+db = Database(cfg)
 
 async def save_user_data(db, user_id, name, mob_number, age, gender, height, weight):
     query = """
@@ -50,3 +47,14 @@ async def save_user_data(db, user_id, name, mob_number, age, gender, height, wei
         weight = EXCLUDED.weight;
     """
     await db.execute(query, user_id, name, mob_number, age, gender, height, weight)
+
+async def if_exists(db, user_id):
+    query = """
+    SELECT EXISTS (
+        SELECT 1 
+        FROM users
+        WHERE user_id = $1
+    )
+    """
+    result = await db.fetch(query, user_id)
+    return result[0]['exists']
