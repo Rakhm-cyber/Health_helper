@@ -8,7 +8,6 @@ from aiogram.types import CallbackQuery
 from db import db, save_user_data
 import asyncpg
 
-
 user_states = {}
 
 quiz_data = [

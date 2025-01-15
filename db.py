@@ -38,13 +38,6 @@ async def save_user_data(db, user_id, name, mob_number, age, gender, height, wei
     query = """
     INSERT INTO users (user_id, name, mob_number, age, gender, height, weight)
     VALUES ($1, $2, $3, $4, $5, $6, $7)
-    ON CONFLICT (user_id) DO UPDATE
-    SET name = EXCLUDED.name,
-        mob_number = EXCLUDED.mob_number,
-        age = EXCLUDED.age,
-        gender = EXCLUDED.gender,
-        height = EXCLUDED.height,
-        weight = EXCLUDED.weight;
     """
     await db.execute(query, user_id, name, mob_number, age, gender, height, weight)
 

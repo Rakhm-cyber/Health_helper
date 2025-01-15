@@ -1,6 +1,8 @@
 from aiogram.types import Message, CallbackQuery, TelegramObject, Update
 from aiogram import BaseMiddleware
 from typing import Callable, Dict, Any, Awaitable
+from aiogram.fsm.context import FSMContext
+from hendlers import Registration
 from datetime import datetime
 from db import db, if_exists
 
@@ -28,11 +30,9 @@ class UserActionLoggerMiddleware(BaseMiddleware):
     async def on_pre_process_message(self, message: Message, data: dict):
         print(f"Обработка сообщения: {message.text}")
 
-
         user_id = message.from_user.id
         username = message.from_user.username or "unknown"
         text = message.text or "No text"
-
 
         if text in ["Информация о проекте", "Викторина о здоровье", "Поддержка"]:
             action_type = "keyboard_button"
@@ -74,30 +74,25 @@ class UserActionLoggerMiddleware(BaseMiddleware):
 
 class UserAuthorizationMiddleware(BaseMiddleware):
     async def __call__(
-        self, handler: Callable[[TelegramObject, Dict[str, Any]], Awaitable[Any]],
-        event: TelegramObject,
+        self, handler: Callable[[Update, Dict[str, Any]], Awaitable[Any]],
+        event: Update,
         data: Dict[str, Any]
     ) -> Any:
-        if hasattr(event, 'from_user') and event.from_user:
-            user_id = event.from_user.id
-        elif hasattr(event, 'message') and event.message and event.message.from_user:
-            user_id = event.message.from_user.id
-        else:
-            if isinstance(event, Message):
-                await event.answer("Ошибка обработки события")
-            return
-            
-
-        if if_exists(db, user_id):
-            return await handler(event, data)
-        else:
-            if isinstance(event, Message):
-                await event.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
-            return
-
-
         
+        state = data.get('raw_state')
 
+        if state in [Registration.name.state, Registration.mob_number.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state]:
+            return await handler(event, data)
 
-   
+        user_id = 0
 
+        if event.message:  
+            user_id = event.message.from_user.id
+        elif event.callback_query:  
+            user_id = event.callback_query.from_user.id
+        
+        if not await if_exists(db, user_id) and not event.message.text.startswith('/registration'):
+            await event.message.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
+            return
+    
+        return await handler(event, data)
