@@ -51,3 +51,12 @@ async def if_exists(db, user_id):
     """
     result = await db.fetch(query, user_id)
     return result[0]['exists']
+
+async def get_weight(db, user_id):
+    query = """
+    SELECT weight
+    FROM users
+    WHERE user_id = $1
+    """
+    result = await db.fetch(query, user_id)
+    return result[0]['weight']

@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from hendlers import Registration
 from datetime import datetime
 from db import db, if_exists
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 class UserActionLoggerMiddleware(BaseMiddleware):
     async def __call__(
@@ -95,4 +96,13 @@ class UserAuthorizationMiddleware(BaseMiddleware):
             await event.message.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
             return
     
+        return await handler(event, data)
+
+class SchedulerMiddleware(BaseMiddleware):
+    def __init__(self, scheduler: AsyncIOScheduler):
+        super().__init__()
+        self._scheduler = scheduler
+
+    async def __call__(self,handler,event,data):
+        data["scheduler"] = self._scheduler
         return await handler(event, data)

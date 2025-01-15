@@ -3,16 +3,21 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
 from hendlers import router
-from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware
+from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware, SchedulerMiddleware
 from db import db
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
 #from gigachat import gigachat_router
 
 telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
 
 dispatcher = Dispatcher(storage=MemoryStorage())
 
-dispatcher.update.middleware(UserAuthorizationMiddleware())  # Подключение мидлвари авторизации
-dispatcher.update.middleware(UserActionLoggerMiddleware())  # Подключение мидлвари логгера
+scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+
+dispatcher.update.middleware(UserAuthorizationMiddleware()) 
+dispatcher.update.middleware(UserActionLoggerMiddleware())
+dispatcher.update.middleware(SchedulerMiddleware(scheduler=scheduler))
 
 dispatcher.include_router(router)
 
@@ -23,6 +28,7 @@ async def set_commands(bot: Bot):
         BotCommand(command="/edit", description="Подкорректируйте данные"),
         BotCommand(command="/profile", description="Ваши данные"),
         BotCommand(command="/chat", description="Начать диалог с GigaChat"),
+        BotCommand(command="/water_remind", description="Регулярные напоминания о питье воды")
     ]
     await bot.set_my_commands(commands)
 
@@ -31,6 +37,8 @@ async def main():
     await db.connect()  # Подключение к базе данных
     await set_commands(telegram_bot)  # Установка команд
     print("Бот запущен. Ожидаем сообщений...")
+    scheduler.start()
+
     await dispatcher.start_polling(telegram_bot)  # Запуск бота с обработкой событий
 
 # Запуск программы
