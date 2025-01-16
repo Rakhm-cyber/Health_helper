@@ -5,6 +5,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import CallbackQuery
+from gigachat_recomendations import physical_activity_recommendations, nutrition_recommendations
 from db import db, save_user_data
 import asyncpg
 
@@ -232,73 +233,39 @@ async def reg_seventh(message: Message, state: FSMContext):
 
 @router.callback_query(lambda c: c.data == "physical_recommendations")
 async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    age = int(data.get("age", 0))
-    gender = data.get("gender", "").lower()
-
-    if age <= 17:
-        recommendation = (
-            "Рекомендуется не менее 60 минут в день заниматься физической активностью "
-            "(бег, игры, зарядка и т.д.), включая аэробную нагрузку. Не менее 3 дней в "
-            "неделю уделяйте внимание укреплению мышц и костей."
-        )
-    elif 18 <= age <= 64:
-        recommendation = (
-            "Рекомендуется 150–300 минут в неделю заниматься физической активностью "
-            "средней интенсивности (ходьба, плавание, танцы и т.д.) или 75–150 минут "
-            "высокой интенсивности. Также добавьте упражнения для укрепления мышц не "
-            "менее 2 дней в неделю."
-        )
-    else:
-        recommendation = (
-            "Пожилым людям рекомендуется 150–300 минут в неделю физической активности "
-            "средней интенсивности или 75–150 минут высокой интенсивности. Добавьте "
-            "упражнения для улучшения равновесия и предотвращения падений не менее 3 дней в неделю."
-        )
-
-    # Отправляем рекомендации пользователю
-    await callback.message.answer(f"Ваши рекомендации по физической нагрузке:\n\n{recommendation}")
+    user_id = callback.from_user.id
+    query = """
+    SELECT age, gender, height, weight
+    FROM users
+    WHERE user_id = $1
+    """
+    user_data = await db.fetch(query, user_id)
+    user_data = user_data[0]
+    recommendation = await physical_activity_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
+    await callback.message.answer(f"{recommendation}")
     await callback.answer()
 
 
 @router.callback_query(lambda c: c.data == "nutrition_recommendations")
-async def nutrition_recommendations(callback: CallbackQuery, state: FSMContext):
-    # Получаем данные пользователя из состояния
-    data = await state.get_data()
-    age = int(data.get("age", 0))  # Извлекаем возраст, если доступен
-
-    # Рекомендации по питанию (пример)
-    if age <= 17:
-        recommendation = (
-            "Для детей и подростков рекомендуется сбалансированное питание с "
-            "упором на фрукты, овощи, цельнозерновые продукты и нежирные белки. "
-            "Ограничьте потребление сладостей и фастфуда."
-        )
-    elif 18 <= age <= 64:
-        recommendation = (
-            "Рекомендуется разнообразное питание с достаточным количеством овощей, "
-            "фруктов, цельнозерновых продуктов, нежирных белков и полезных жиров. "
-            "Ограничьте потребление соли, сахара и насыщенных жиров."
-        )
-    else:
-        recommendation = (
-            "Пожилым людям важно включать в рацион продукты, богатые витаминами D и B12, "
-            "а также кальцием для поддержания здоровья костей. Пейте достаточное количество воды."
-        )
-
-    # Отправляем рекомендации пользователю
-    await callback.message.answer(f"Ваши рекомендации по питанию:\n\n{recommendation}")
+async def nutrition_recommendations_h(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    query = """
+    SELECT age, gender, height, weight
+    FROM users
+    WHERE user_id = $1
+    """
+    user_data = await db.fetch(query, user_id)
+    user_data = user_data[0]
+    recommendation = await nutrition_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
+    await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
     await callback.answer()
 
 
-from db import db  # Импортируем объект базы данных
 
 @router.message(Command('profile'))
 async def show_profile(message: Message):
-    # Извлекаем user_id пользователя
     user_id = message.from_user.id
 
-    # Получаем данные пользователя из базы данных
     query = """
     SELECT name, mob_number, age, gender, height, weight
     FROM users
