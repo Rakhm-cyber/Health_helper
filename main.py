@@ -10,7 +10,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from gigachat_hendler import gigachat_router
 
-telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
+telegram_bot = Bot(token="7768523863:AAFjDZwEO_kz9WrWjBQonBW7MHTs1UQJF5c")
 
 dispatcher = Dispatcher(storage=MemoryStorage())
 scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
