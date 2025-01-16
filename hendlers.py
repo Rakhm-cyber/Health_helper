@@ -395,19 +395,45 @@ async def update_age(message: Message, state: FSMContext):
 
 
 
+@router.callback_query(lambda c: c.data == "edit_height")
+async def edit_height(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите новый рост (в сантиметрах):")
+    await state.set_state(EditProfile.height)  # Устанавливаем состояние для редактирования роста
+    await callback.answer()
+
+@router.message(EditProfile.height)
+async def update_height(message: Message, state: FSMContext):
+    if not message.text.isdigit() or int(message.text) <= 0:
+        await message.answer("Пожалуйста, введите корректный рост (число).")
+        return
+
+    new_height = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET height = $1 WHERE user_id = $2"
+    await db.execute(query, new_height, user_id)
+
+    await message.answer("Ваш рост успешно обновлён.")
+    await state.clear()
+
 @router.callback_query(lambda c: c.data == "edit_weight")
 async def edit_weight(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите новый вес (в килограммах):")
-    await state.set_state(Registration.weight)
+    await state.set_state(EditProfile.weight)  # Устанавливаем состояние для редактирования веса
     await callback.answer()
 
-@router.message(Registration.weight)
+@router.message(EditProfile.weight)
 async def update_weight(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
-    await state.update_data(weight=message.text)
-    await message.answer("Ваш вес успешно обновлен.")
+
+    new_weight = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET weight = $1 WHERE user_id = $2"
+    await db.execute(query, new_weight, user_id)
+
+    await message.answer("Ваш вес успешно обновлён.")
+    await state.clear()
 
 async def send_water_reminder(id, bot, start_time: time, end_time: time):
     current_time = datetime.now().time()

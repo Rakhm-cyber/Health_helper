@@ -7,7 +7,7 @@ from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware,
 from db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-#from gigachat import gigachat_router
+from gigachat_handler import gigachat_router
 
 telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
 
@@ -20,7 +20,7 @@ dispatcher.update.middleware(UserActionLoggerMiddleware())
 dispatcher.update.middleware(SchedulerMiddleware(scheduler=scheduler))
 
 dispatcher.include_router(router)
-
+dispatcher.include_router(gigachat_router)
 async def set_commands(bot: Bot):
     commands = [
         BotCommand(command="/start", description="Начать работу с ботом"),
