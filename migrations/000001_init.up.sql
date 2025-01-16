@@ -17,3 +17,10 @@ CREATE TABLE IF NOT EXISTS user_actions (
     message TEXT NOT NULL,
     timestamp TIMESTAMP NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS user_drinked_water (
+    user_id PRIMARY KEY NOT NULL,
+    day DATE NOT NULL,
+    water INTEGER NOT NULL,
+);

@@ -1,5 +1,6 @@
 import asyncpg
 import config
+from datetime import datetime
 
 class Database:
     def __init__(self, cfg):
@@ -60,3 +61,24 @@ async def get_weight(db, user_id):
     """
     result = await db.fetch(query, user_id)
     return result[0]['weight']
+
+async def add_water(db, user_id):
+    current_day = datetime.now().date()
+    res = get_water(db, user_id, current_day)
+    if result:
+        new_water_amount = res + 250
+        await db.execute(
+            'UPDATE user_water SET water = $1 WHERE user_id = $2 AND day = $3',
+            new_water_amount, user_id, current_day
+        )
+    else:
+        await db.execute(
+            'INSERT INTO user_water (user_id, day, water) VALUES ($1, $2, $3)',
+            user_id, current_day, 250
+        )
+
+async def get_water(db, user_id, day):
+    res = await db.fetch('SELECT water FROM user_water WHERE user_id = $1 AND day = $2', user_id, day)
+    if res:
+        return res[0]['water']
+    return None

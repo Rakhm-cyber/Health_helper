@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import CallbackQuery
-from db import db, save_user_data, get_weight
+from db import db, save_user_data, get_weight, get_water
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 import asyncpg
 from datetime import time, datetime
@@ -420,6 +420,19 @@ async def send_water_reminder(id, bot, start_time: time, end_time: time):
         )
         await bot.send_message(id, "Выпей стакан воды!", reply_markup=water_remind_keyboard)
 
+async def send_water_result(id: int, bot: Bot):
+    total_water = get_water(db, user_id, datetime.now().date())
+    weight = get_weight(db, user_id)
+    should = weight * 30
+    message = ""
+    if total_water/should >= 1:
+        message = "Поздравляю, Вы справились!"
+    if total_water/should > 0,7:
+        message = "Вы почти справились!"
+    if total_water/should < 0,7:
+        message = "Вам стоит пить больше."
+    await bot.send_message(id, f"Сегодня вы выпили {total_water} мл воды.\n" + message)
+
 @router.message(Command('water_remind'))
 async def water_remind(message: Message, bot: Bot, scheduler: AsyncIOScheduler, state: FSMContext):
     await message.answer("Введите начало дня в формате HH:MM")
@@ -478,12 +491,24 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
 
         await message.answer(f"Теперь я буду напоминать вам каждые {minutes} минут пить воду с {start_time} до {end_time}!")
         await state.clear()
+
+        now = datetime.now()
+
+        end_time = datetime.strptime(message_time, "%H:%M").replace(year=now.year, month=now.month, day=now.day)
+
+        if end_time < now:
+            end_time += timedelta(days=1)
+
+        initial_delay = (end_time - now).total_seconds()
+
+        scheduler.add_job(send_water_result, IntervalTrigger(seconds=86400, start_date=end_time), args=[user_id, bot])
     except ValueError:
         await message.answer("Некорректный формат времени. Попробуйте ещё раз. Формат: HH:MM")
 
 @router.callback_query(lambda c: c.data == "drink_water")
 async def disable_reminders(callback_query: CallbackQuery, bot: Bot, scheduler: AsyncIOScheduler):
     user_id = callback_query.from_user.id
+    add_water(db, user_id)
 
 
 @router.callback_query(lambda c: c.data == "disable_reminders")
