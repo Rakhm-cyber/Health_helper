@@ -22,15 +22,12 @@ dispatcher.update.middleware(UserAuthorizationMiddleware())
 dispatcher.update.middleware(UserActionLoggerMiddleware())
 dispatcher.update.middleware(SchedulerMiddleware(scheduler=scheduler))
 
-dispatcher.include_router(router)
-
 async def set_commands(bot: Bot):
     commands = [
         BotCommand(command="/start", description="Начать работу с ботом"),
         BotCommand(command="/registration", description="Пройти регистрацию"),
         BotCommand(command="/edit", description="Подкорректируйте данные"),
         BotCommand(command="/profile", description="Ваши данные"),
-        BotCommand(command="/chat", description="Начать диалог с GigaChat"),
         BotCommand(command="/water_remind", description="Регулярные напоминания о питье воды")
     ]
     await bot.set_my_commands(commands)

@@ -429,9 +429,9 @@ async def send_water_result(id: int, bot: Bot):
     message = ""
     if total_water/should >= 1:
         message = "Поздравляю, Вы справились!"
-    if total_water/should > 0,7:
+    if total_water/should > 0.7:
         message = "Вы почти справились!"
-    if total_water/should < 0,7:
+    if total_water/should < 0.7:
         message = "Вам стоит пить больше."
     await bot.send_message(id, f"Сегодня вы выпили {total_water} мл воды.\n" + message)
 
@@ -493,10 +493,6 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
 
         await message.answer(f"Теперь я буду напоминать вам каждые {minutes} минут пить воду с {start_time} до {end_time}!")
         await state.clear()
-
-        now = datetime.now()
-
-        end_time = datetime.strptime(message_time, "%H:%M").replace(year=now.year, month=now.month, day=now.day)
 
         if end_time < now:
             end_time += timedelta(days=1)
