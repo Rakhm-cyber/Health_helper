@@ -1,8 +1,10 @@
-from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_gigachat import GigaChat
+from langchain.prompts import PromptTemplate
 
 
 GigaChatKey = "MWZkMmM0ZDktNDhjZS00ZWFlLWI5Y2YtZjZmZTkwNjUyMWM5OjVhM2Y3OTNiLTRhYjAtNDQ3OS05ZjFmLTRlMTdjMDBkYjc1MA=="
+
 
 chat = GigaChat(
     credentials=GigaChatKey,
@@ -10,34 +12,72 @@ chat = GigaChat(
     verify_ssl_certs=False
 )
 
+
+physical_activity_template = PromptTemplate(
+    input_variables=["age", "gender", "height", "weight"],
+    template="""Ты очень хороший специалист по здоровью человека, ты отлично знаешь как давать правильные
+    рекомендации индивидуально для каждого, учитывая пол, возраст, рост и вес человека.
+
+    Данные пользователя:
+    - Возраст: {age} лет
+    - Пол: {gender}
+    - Рост: {height} см
+    - Вес: {weight} кг
+
+    Ты должен:
+    1. Рассчитать индекс массы тела (ИМТ) как Вес (кг) / (Рост (м) * Рост (м)).
+    2. Определить, больше ли вес нормы, или меньше.
+    3. Подобрать рекомендации по физической активности, которые подходят для этого пользователя.
+    
+    Ответ дай БЕЗ каких-либо формул, потому что твой ответ не получится отформатировать.(Просто пиши,
+    чему примерно равняется индекс массы тела)
+    Ответ начни с фразы: *Вот ваши рекомендации по физической активности:*.
+    """
+)
+
+nutrition_template = PromptTemplate(
+    input_variables=["age", "gender", "height", "weight"],
+    template="""Ты очень хороший специалист по здоровью человека, ты отлично знаешь как давать правильные
+    рекомендации индивидуально для каждого, учитывая пол, возраст, рост и вес человека.
+
+    Данные пользователя:
+    - Возраст: {age} лет
+    - Пол: {gender}
+    - Рост: {height} см
+    - Вес: {weight} кг
+
+    Ты должен:
+    1. Рассчитать индекс массы тела (ИМТ) как Вес (кг) / (Рост (м) * Рост (м)).
+    2. Определить, больше ли вес нормы, или меньше.
+    3. Подобрать рекомендации по питанию, которые подходят для этого пользователя.
+
+    Ответ дай БЕЗ каких-либо формул, потому что твой ответ не получится отформатировать.(Просто пиши,
+    чему примерно равняется индекс массы тела)
+    Ответ начни с фразы: *Вот ваши рекомендации по питанию:*.
+    """
+)
+
+
+
 async def physical_activity_recommendations(age, gender, height, weight):
-    messages = [
-        SystemMessage(
-            content="""Ты очень хороший специалист по здоровью человека, ты отлично знаешь как давать правильные
-            рекоммендации индивидульно для каждого учитывая пол, рост, вес, возраст человека. Тебе пришлют эти 
-            характеристики, а ты должен подобрать рекоммендации по физической активности для человека с этими 
-            характеристиками. Свой ответ начни без приветствия, с фразы *Вот ваши рекоммендации по физической
-            активности:*. Ты должен также уточнить больше ли вес нормы, или меньше. Ответ должен быть максимально
-            полным. Обрати внимание, что рост пользователя передается в сантиметрах, а вес в килограммах. Инедкс
-             массы тела расчитывается как Вес(кг)/(Рост(м) * Рост(м))"""
-        ),
-        HumanMessage(content=f"Возраст - {age}, Пол - {gender}, Рост - {height}, Вес - {weight}"),
-    ]
-    result = chat.invoke(messages).content
-    return result
+    prompt = physical_activity_template.format(
+        age=age,
+        gender=gender,
+        height=height,
+        weight=weight
+    )
+
+    result = chat.invoke([HumanMessage(content=prompt)])
+    return result.content
+
+
 
 async def nutrition_recommendations(age, gender, height, weight):
-    messages = [
-        SystemMessage(
-            content="""Ты очень хороший специалист по здоровью человека, ты отлично знаешь как давать правильные
-            рекоммендации индивидульно для каждого учитывая пол, рост, вес, возраст человека. Тебе пришлют эти 
-            характеристики, а ты должен подобрать рекоммендации по питанию для человека с этими 
-            характеристиками. Свой ответ начни без приветствия, с фразы *Вот ваши рекоммендации по питанию:*. 
-            Ты должен также уточнить больше ли вес нормы, или меньше. Ответ должен быть максимально
-            полным. Обрати внимание, что рост пользователя передается в сантиметрах, а вес в килограммах. Инедкс
-            массы тела расчитывается как Вес(кг)/(Рост(м) * Рост(м))"""
-        ),
-        HumanMessage(content=f"Возраст - {age}, Пол - {gender}, Рост - {height}, Вес - {weight}"),
-    ]
-    result = chat.invoke(messages).content
-    return result
+    prompt = nutrition_template.format(
+        age=age,
+        gender=gender,
+        height=height,
+        weight=weight
+    )
+    result = chat.invoke([HumanMessage(content=prompt)])
+    return result.content

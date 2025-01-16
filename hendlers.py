@@ -84,7 +84,16 @@ class Registration(StatesGroup):
 
 @router.message(lambda message: message.text == "Информация о проекте")
 async def handle_project_info(message: types.Message):
-    await message.answer("Информация о проекте:\nЭтот бот создан для помощи людям в поддержке личного здоровья.")
+    await message.answer(
+        "Информация о проекте:\n"
+        "Этот бот создан для помощи людям в поддержке личного здоровья.\n"
+        "Проект выполнен в рамках научно-исследовательского семинара"
+        '"Искусственный интеллект в инженерном образовании"'
+        "МИЭМ НИУ ВШЭ студентами группы БИВ234:\n"
+        "- Наумовым Виталием\n"
+        "- Рахматуллиным Айгизом."
+    )
+
 
 @router.message(lambda message: message.text == "Поддержка")
 async def handle_support(message: types.Message):
@@ -191,7 +200,7 @@ async def reg_fifth(message: Message, state: FSMContext):
         return
     await state.update_data(gender=message.text)
     await state.set_state(Registration.height)
-    await message.answer('Введите ваш рост (в сантиметрах):')  # Новый вопрос
+    await message.answer('Введите ваш рост (в сантиметрах):')
 
 @router.message(Registration.height)
 async def reg_sixth(message: Message, state: FSMContext):
@@ -242,7 +251,7 @@ async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
     user_data = await db.fetch(query, user_id)
     user_data = user_data[0]
     recommendation = await physical_activity_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
-    await callback.message.answer(f"{recommendation}")
+    await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
     await callback.answer()
 
 
