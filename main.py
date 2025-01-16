@@ -3,17 +3,20 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
 from hendlers import router
+
 from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware, SchedulerMiddleware
 from db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-#from gigachat import gigachat_router
+from gigachat_hendler import gigachat_router
 
 telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
 
 dispatcher = Dispatcher(storage=MemoryStorage())
-
 scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
+
+dispatcher.include_router(router)
+dispatcher.include_router(gigachat_router)
 
 dispatcher.update.middleware(UserAuthorizationMiddleware()) 
 dispatcher.update.middleware(UserActionLoggerMiddleware())

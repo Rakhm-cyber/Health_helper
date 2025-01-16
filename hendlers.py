@@ -7,6 +7,9 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeybo
 from aiogram.types import CallbackQuery
 from db import db, save_user_data, get_weight, get_water
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+from gigachat_recomendations import physical_activity_recommendations, nutrition_recommendations
+
 import asyncpg
 from datetime import time, datetime
 
@@ -124,11 +127,26 @@ class WaterReminderStates(StatesGroup):
 
 @router.message(lambda message: message.text == "Информация о проекте")
 async def handle_project_info(message: types.Message):
-    await message.answer("Информация о проекте:\nЭтот бот создан для помощи людям в поддержке личного здоровья.")
+    await message.answer(
+        "Информация о проекте:\n"
+        "Этот бот создан для помощи людям в поддержке личного здоровья.\n"
+        "Проект выполнен в рамках научно-исследовательского семинара"
+        '"Искусственный интеллект в инженерном образовании"'
+        "МИЭМ НИУ ВШЭ студентами группы БИВ234:\n"
+        "- Наумовым Виталием\n"
+        "- Рахматуллиным Айгизом."
+    )
+
 
 @router.message(lambda message: message.text == "Поддержка")
 async def handle_support(message: types.Message):
-    await message.answer("Свяжитесь с разработчиком: [Написать в Telegram](https://t.me/neeeeectdis)", parse_mode="Markdown")
+    await message.answer(
+        "Свяжитесь с разработчиком:\n"
+        "[Написать в Telegram (1)](https://t.me/neeeeectdis)\n"
+        "[Написать в Telegram (2)](https://t.me/veetalya)",
+        parse_mode="Markdown"
+    )
+
 
 @router.message(lambda message: message.text == "Викторина о здоровье")
 async def start_quiz(message: types.Message):
@@ -142,9 +160,6 @@ async def start_quiz(message: types.Message):
     )
 
 def generate_quiz_keyboard(question_index: int):
-    """
-    Создает inline-клавиатуру для текущего вопроса викторины.
-    """
     buttons = [
         [InlineKeyboardButton(text=option, callback_data=f"quiz_{question_index}_{i}")]
         for i, option in enumerate(quiz_data[question_index]["options"])
@@ -228,7 +243,7 @@ async def reg_fifth(message: Message, state: FSMContext):
         return
     await state.update_data(gender=message.text)
     await state.set_state(Registration.height)
-    await message.answer('Введите ваш рост (в сантиметрах):')  # Новый вопрос
+    await message.answer('Введите ваш рост (в сантиметрах):')
 
 @router.message(Registration.height)
 async def reg_sixth(message: Message, state: FSMContext):
@@ -245,12 +260,10 @@ async def reg_seventh(message: Message, state: FSMContext):
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
 
-    # Сохраняем данные веса
     await state.update_data(weight=message.text)
 
-    # Извлекаем все данные, чтобы проверить их
     data = await state.get_data()
-    print(data)  # Лог для проверки
+    print(data)
     await save_user_data(
         db=db,
         user_id=message.from_user.id,
@@ -272,73 +285,39 @@ async def reg_seventh(message: Message, state: FSMContext):
 
 @router.callback_query(lambda c: c.data == "physical_recommendations")
 async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
-    data = await state.get_data()
-    age = int(data.get("age", 0))
-    gender = data.get("gender", "").lower()
-
-    if age <= 17:
-        recommendation = (
-            "Рекомендуется не менее 60 минут в день заниматься физической активностью "
-            "(бег, игры, зарядка и т.д.), включая аэробную нагрузку. Не менее 3 дней в "
-            "неделю уделяйте внимание укреплению мышц и костей."
-        )
-    elif 18 <= age <= 64:
-        recommendation = (
-            "Рекомендуется 150–300 минут в неделю заниматься физической активностью "
-            "средней интенсивности (ходьба, плавание, танцы и т.д.) или 75–150 минут "
-            "высокой интенсивности. Также добавьте упражнения для укрепления мышц не "
-            "менее 2 дней в неделю."
-        )
-    else:
-        recommendation = (
-            "Пожилым людям рекомендуется 150–300 минут в неделю физической активности "
-            "средней интенсивности или 75–150 минут высокой интенсивности. Добавьте "
-            "упражнения для улучшения равновесия и предотвращения падений не менее 3 дней в неделю."
-        )
-
-    # Отправляем рекомендации пользователю
-    await callback.message.answer(f"Ваши рекомендации по физической нагрузке:\n\n{recommendation}")
+    user_id = callback.from_user.id
+    query = """
+    SELECT age, gender, height, weight
+    FROM users
+    WHERE user_id = $1
+    """
+    user_data = await db.fetch(query, user_id)
+    user_data = user_data[0]
+    recommendation = await physical_activity_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
+    await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
     await callback.answer()
 
 
 @router.callback_query(lambda c: c.data == "nutrition_recommendations")
-async def nutrition_recommendations(callback: CallbackQuery, state: FSMContext):
-    # Получаем данные пользователя из состояния
-    data = await state.get_data()
-    age = int(data.get("age", 0))  # Извлекаем возраст, если доступен
-
-    # Рекомендации по питанию (пример)
-    if age <= 17:
-        recommendation = (
-            "Для детей и подростков рекомендуется сбалансированное питание с "
-            "упором на фрукты, овощи, цельнозерновые продукты и нежирные белки. "
-            "Ограничьте потребление сладостей и фастфуда."
-        )
-    elif 18 <= age <= 64:
-        recommendation = (
-            "Рекомендуется разнообразное питание с достаточным количеством овощей, "
-            "фруктов, цельнозерновых продуктов, нежирных белков и полезных жиров. "
-            "Ограничьте потребление соли, сахара и насыщенных жиров."
-        )
-    else:
-        recommendation = (
-            "Пожилым людям важно включать в рацион продукты, богатые витаминами D и B12, "
-            "а также кальцием для поддержания здоровья костей. Пейте достаточное количество воды."
-        )
-
-    # Отправляем рекомендации пользователю
-    await callback.message.answer(f"Ваши рекомендации по питанию:\n\n{recommendation}")
+async def nutrition_recommendations_h(callback: CallbackQuery, state: FSMContext):
+    user_id = callback.from_user.id
+    query = """
+    SELECT age, gender, height, weight
+    FROM users
+    WHERE user_id = $1
+    """
+    user_data = await db.fetch(query, user_id)
+    user_data = user_data[0]
+    recommendation = await nutrition_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
+    await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
     await callback.answer()
 
 
-from db import db  # Импортируем объект базы данных
 
 @router.message(Command('profile'))
 async def show_profile(message: Message):
-    # Извлекаем user_id пользователя
     user_id = message.from_user.id
 
-    # Получаем данные пользователя из базы данных
     query = """
     SELECT name, mob_number, age, gender, height, weight
     FROM users
@@ -384,8 +363,6 @@ async def update_age(message: Message, state: FSMContext):
 
     new_age = int(message.text)
     user_id = message.from_user.id
-
-    # Обновляем возраст в базе данных
     query = "UPDATE users SET age = $1 WHERE user_id = $2"
     await db.execute(query, new_age, user_id)
 
@@ -393,21 +370,46 @@ async def update_age(message: Message, state: FSMContext):
     await state.clear()
 
 
+@router.callback_query(lambda c: c.data == "edit_height")
+async def edit_height(callback: CallbackQuery, state: FSMContext):
+    await callback.message.answer("Введите новый рост (в сантиметрах):")
+    await state.set_state(EditProfile.height)  # Устанавливаем состояние для редактирования роста
+    await callback.answer()
+
+@router.message(EditProfile.height)
+async def update_height(message: Message, state: FSMContext):
+    if not message.text.isdigit() or int(message.text) <= 0:
+        await message.answer("Пожалуйста, введите корректный рост (число).")
+        return
+
+    new_height = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET height = $1 WHERE user_id = $2"
+    await db.execute(query, new_height, user_id)
+
+    await message.answer("Ваш рост успешно обновлён.")
+    await state.clear()
 
 
 @router.callback_query(lambda c: c.data == "edit_weight")
 async def edit_weight(callback: CallbackQuery, state: FSMContext):
     await callback.message.answer("Введите новый вес (в килограммах):")
-    await state.set_state(Registration.weight)
+    await state.set_state(EditProfile.weight)  # Устанавливаем состояние для редактирования веса
     await callback.answer()
 
-@router.message(Registration.weight)
+@router.message(EditProfile.weight)
 async def update_weight(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
-    await state.update_data(weight=message.text)
-    await message.answer("Ваш вес успешно обновлен.")
+
+    new_weight = int(message.text)
+    user_id = message.from_user.id
+    query = "UPDATE users SET weight = $1 WHERE user_id = $2"
+    await db.execute(query, new_weight, user_id)
+
+    await message.answer("Ваш вес успешно обновлён.")
+    await state.clear()
 
 async def send_water_reminder(id, bot, start_time: time, end_time: time):
     current_time = datetime.now().time()
