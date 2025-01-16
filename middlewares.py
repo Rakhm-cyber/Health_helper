@@ -1,9 +1,11 @@
 from aiogram.types import Message, CallbackQuery, TelegramObject, Update
 from aiogram import BaseMiddleware
 from typing import Callable, Dict, Any, Awaitable
+from aiogram.fsm.context import FSMContext
+from hendlers import Registration
 from datetime import datetime
-from db import db
-
+from db import db, if_exists
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 class UserActionLoggerMiddleware(BaseMiddleware):
     async def __call__(
@@ -29,11 +31,9 @@ class UserActionLoggerMiddleware(BaseMiddleware):
     async def on_pre_process_message(self, message: Message, data: dict):
         print(f"Обработка сообщения: {message.text}")
 
-
         user_id = message.from_user.id
         username = message.from_user.username or "unknown"
         text = message.text or "No text"
-
 
         if text in ["Информация о проекте", "Викторина о здоровье", "Поддержка"]:
             action_type = "keyboard_button"
@@ -72,3 +72,37 @@ class UserActionLoggerMiddleware(BaseMiddleware):
             print(f"Успешно записано действие: {user_id}, {username}, {action_type}, {callback_data}, {timestamp}")
         except Exception as e:
             print(f"Ошибка при записи в базу данных: {e}")
+
+class UserAuthorizationMiddleware(BaseMiddleware):
+    async def __call__(
+        self, handler: Callable[[Update, Dict[str, Any]], Awaitable[Any]],
+        event: Update,
+        data: Dict[str, Any]
+    ) -> Any:
+        
+        state = data.get('raw_state')
+
+        if state in [Registration.name.state, Registration.mob_number.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state]:
+            return await handler(event, data)
+
+        user_id = 0
+
+        if event.message:  
+            user_id = event.message.from_user.id
+        elif event.callback_query:  
+            user_id = event.callback_query.from_user.id
+        
+        if not await if_exists(db, user_id) and not event.message.text.startswith('/registration'):
+            await event.message.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
+            return
+    
+        return await handler(event, data)
+
+class SchedulerMiddleware(BaseMiddleware):
+    def __init__(self, scheduler: AsyncIOScheduler):
+        super().__init__()
+        self._scheduler = scheduler
+
+    async def __call__(self,handler,event,data):
+        data["scheduler"] = self._scheduler
+        return await handler(event, data)
