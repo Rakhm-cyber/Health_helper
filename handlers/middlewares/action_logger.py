@@ -1,3 +1,5 @@
+from database import repository
+
 from aiogram.types import Message, CallbackQuery, TelegramObject, Update
 from aiogram import BaseMiddleware
 from typing import Callable, Dict, Any, Awaitable
@@ -13,9 +15,9 @@ class UserActionLoggerMiddleware(BaseMiddleware):
         print(f"Тип события: {type(event)}")
 
         if isinstance(event, Update):
-            if event.message:  # Если это сообщение
+            if event.message: 
                 await self.on_pre_process_message(event.message, data)
-            elif event.callback_query:  # Если это callback
+            elif event.callback_query: 
                 await self.on_pre_process_callback_query(event.callback_query, data)
             else:
                 print("Неизвестный тип события в Update")
@@ -38,17 +40,7 @@ class UserActionLoggerMiddleware(BaseMiddleware):
         else:
             action_type = "message"
 
-        timestamp = datetime.utcnow()
-
-        try:
-            query = """
-            INSERT INTO user_actions (user_id, username, action_type, message, timestamp)
-            VALUES ($1, $2, $3, $4, $5)
-            """
-            await db.execute(query, user_id, username, action_type, text, timestamp)
-            print(f"Успешно записано действие: {user_id}, {username}, {action_type}, {text}, {timestamp}")
-        except Exception as e:
-            print(f"Ошибка при записи в базу данных: {e}")
+        await self.save_action(user_id, username, action_type, text)
 
     async def on_pre_process_callback_query(self, callback_query: CallbackQuery, data: dict):
         print(f"Обработка callback-запроса: {callback_query.data}")
@@ -57,14 +49,14 @@ class UserActionLoggerMiddleware(BaseMiddleware):
         username = callback_query.from_user.username or "unknown"
         callback_data = callback_query.data
         action_type = "callback"
-        timestamp = datetime.utcnow()
 
+        await self.save_action(user_id, username, action_type, callback_data)
+
+    async def save_action(self, user_id, username, action_type, message):
+        timestamp = datetime.now()
+                
         try:
-            query = """
-            INSERT INTO user_actions (user_id, username, action_type, message, timestamp)
-            VALUES ($1, $2, $3, $4, $5)
-            """
-            await db.execute(query, user_id, username, action_type, callback_data, timestamp)
-            print(f"Успешно записано действие: {user_id}, {username}, {action_type}, {callback_data}, {timestamp}")
+            await repository.save_action(user_id, username, action_type, message, timestamp)
         except Exception as e:
-            print(f"Ошибка при записи в базу данных: {e}")
+            print(f"Ошибка при записи действия в базу данных: {e}")
+    
