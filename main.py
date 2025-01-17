@@ -45,7 +45,7 @@ async def main():
     await set_commands(telegram_bot) 
 
     print("Бот запущен. Ожидаем сообщений...")
-    scheduler.start()
+    scheduler.start(timezone="Europe/Moscow")
 
     await dispatcher.start_polling(telegram_bot)
 
