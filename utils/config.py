@@ -9,6 +9,7 @@ class Config:
         self.postgres_port = env.get('POSTGRES_PORT', None)
         self.postgres_host = env.get('POSTGRES_HOST', None)
         self.telegram_token = env.get('TELEGRAM_TOKEN', None)
+        self.gigachat_key = env.get('GIGACHAT_KEY', None)
 
 def load():
     load_dotenv()
@@ -19,7 +20,8 @@ def load():
         'POSTGRES_DB': os.getenv('POSTGRES_DB'),
         'POSTGRES_PORT': os.getenv('POSTGRES_PORT'),
         'POSTGRES_HOST': os.getenv('POSTGRES_HOST'),
-        'TELEGRAM_TOKEN': os.getenv('TELEGRAM_TOKEN')
+        'TELEGRAM_TOKEN': os.getenv('TELEGRAM_TOKEN'),
+        'GIGACHAT_KEY': os.getenv('GIGACHAT_KEY')
     }
 
     return Config(env)
