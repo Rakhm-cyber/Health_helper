@@ -1,5 +1,5 @@
 from database.postgres import Database
-import utils.config as config
+from utils import config
 from datetime import datetime
 
 cfg = config.load()

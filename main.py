@@ -2,25 +2,17 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
-from hendlers import router
-
-from middlewares import UserActionLoggerMiddleware, UserAuthorizationMiddleware, SchedulerMiddleware
-from db import db
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from gigachat_hendler import gigachat_router
+from handlers.handler import router
+from handlers.gigachat.gigachat_handler import gigachat_router
 
-telegram_bot = Bot(token="7768523863:AAFjDZwEO_kz9WrWjBQonBW7MHTs1UQJF5c")
+from handlers.middlewares.action_logger import UserActionLoggerMiddleware
+from handlers.middlewares.authorization import UserAuthorizationMiddleware
+from handlers.middlewares.scheduler import SchedulerMiddleware
 
-dispatcher = Dispatcher(storage=MemoryStorage())
-scheduler = AsyncIOScheduler(timezone='Europe/Moscow')
-
-dispatcher.include_router(router)
-dispatcher.include_router(gigachat_router)
-
-dispatcher.update.middleware(UserAuthorizationMiddleware()) 
-dispatcher.update.middleware(UserActionLoggerMiddleware())
-dispatcher.update.middleware(SchedulerMiddleware(scheduler=scheduler))
+from utils import config
+from database import repository
 
 async def set_commands(bot: Bot):
     commands = [
@@ -28,19 +20,34 @@ async def set_commands(bot: Bot):
         BotCommand(command="/registration", description="Пройти регистрацию"),
         BotCommand(command="/edit", description="Подкорректируйте данные"),
         BotCommand(command="/profile", description="Ваши данные"),
-        BotCommand(command="/water_remind", description="Регулярные напоминания о питье воды")
+        BotCommand(command="/water_remind", description="Вкл/Выкл регулярные напоминания о питье воды")
     ]
     await bot.set_my_commands(commands)
 
-# Основная асинхронная функция для старта бота
 async def main():
-    await db.connect()  # Подключение к базе данных
-    await set_commands(telegram_bot)  # Установка команд
+    cfg = config.load()
+
+    #telegram_bot = Bot(token=cfg.telegram_token)
+    telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
+
+    dispatcher = Dispatcher(storage=MemoryStorage())
+    scheduler = AsyncIOScheduler()
+
+    dispatcher.include_router(router)
+    dispatcher.include_router(gigachat_router)
+
+    dispatcher.update.middleware(UserAuthorizationMiddleware()) 
+    dispatcher.update.middleware(UserActionLoggerMiddleware())
+    dispatcher.update.middleware(SchedulerMiddleware(scheduler=scheduler))
+
+    await repository.db.connect()
+
+    await set_commands(telegram_bot) 
+
     print("Бот запущен. Ожидаем сообщений...")
     scheduler.start()
 
-    await dispatcher.start_polling(telegram_bot)  # Запуск бота с обработкой событий
+    await dispatcher.start_polling(telegram_bot)
 
-# Запуск программы
 if __name__ == "__main__":
     asyncio.run(main())

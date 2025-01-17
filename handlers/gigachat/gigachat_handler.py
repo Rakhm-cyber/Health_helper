@@ -6,7 +6,7 @@ from langgraph.graph import START, MessagesState, StateGraph
 from aiogram import Router, F
 from aiogram.types import Message
 
-import utils.config as config
+from utils import config
 
 cfg = config.load()
 
