@@ -2,19 +2,9 @@ from handlers.handler import router
 from database import repository 
 
 from aiogram.fsm.context import FSMContext
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import CallbackQuery
 
 from handlers.gigachat.gigachat_recomendations import physical_activity_recommendations, nutrition_recommendations
-
-recommendation_keyboard = InlineKeyboardMarkup(
-    inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Рекомендации по физической нагрузке", callback_data="physical_recommendations"),
-            InlineKeyboardButton(text="Рекомендации по питанию", callback_data="nutrition_recommendations"),
-        ]
-    ]
-)
 
 @router.callback_query(lambda c: c.data == "physical_recommendations")
 async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
