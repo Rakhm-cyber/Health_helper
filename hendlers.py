@@ -5,7 +5,7 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
 from aiogram.types import CallbackQuery
-from db import db, save_user_data, get_weight, get_water
+from db import db, save_user_data, get_weight, get_water, if_exists
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from gigachat_recomendations import physical_activity_recommendations, nutrition_recommendations
@@ -212,6 +212,9 @@ async def cmd_start(message: Message):
 
 @router.message(Command('registration'))
 async def reg_first(message: Message, state: FSMContext):
+    if await if_exists(db, message.from_user.id):
+        await message.answer('Вы уже зарегистрированы.')
+        return
     await state.set_state(Registration.name)
     await message.answer('Введите ваше имя:')
 
