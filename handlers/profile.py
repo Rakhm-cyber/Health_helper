@@ -32,11 +32,8 @@ async def show_profile(message: Message):
     user_id = message.from_user.id
 
     user_data = await repository.get_user(user_id)
-
-    if not user_data:
-        await message.answer("Ваш профиль пуст. Пожалуйста, пройдите регистрацию командой /registration.")
-        return
     user_data = user_data[0]
+
     profile_text = (
         f"Ваш профиль:\n"
         f"Имя: {user_data['name'] or 'Не указано'}\n"
