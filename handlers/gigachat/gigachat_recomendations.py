@@ -1,11 +1,13 @@
+from utils import config
+
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_gigachat import GigaChat
 from langchain.prompts import PromptTemplate
 
-GigaChatKey = "MWZkMmM0ZDktNDhjZS00ZWFlLWI5Y2YtZjZmZTkwNjUyMWM5OjVhM2Y3OTNiLTRhYjAtNDQ3OS05ZjFmLTRlMTdjMDBkYjc1MA=="
+cfg = config.load()
 
 chat = GigaChat(
-    credentials=GigaChatKey,
+    credentials=cfg.gigachat_key,
     model='GigaChat:latest',
     verify_ssl_certs=False
 )

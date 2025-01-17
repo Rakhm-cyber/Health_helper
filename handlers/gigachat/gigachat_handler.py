@@ -1,3 +1,5 @@
+from utils import config
+
 from langchain_gigachat import GigaChat
 from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -5,8 +7,6 @@ from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import START, MessagesState, StateGraph
 from aiogram import Router, F
 from aiogram.types import Message
-
-from utils import config
 
 cfg = config.load()
 
