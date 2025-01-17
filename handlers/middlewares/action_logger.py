@@ -2,7 +2,6 @@ from aiogram.types import Message, CallbackQuery, TelegramObject, Update
 from aiogram import BaseMiddleware
 from typing import Callable, Dict, Any, Awaitable
 from datetime import datetime
-from db import db, if_exists
 
 class UserActionLoggerMiddleware(BaseMiddleware):
     async def __call__(
