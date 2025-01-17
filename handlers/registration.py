@@ -32,7 +32,8 @@ recommendation_keyboard = InlineKeyboardMarkup(
 
 @router.message(Command('registration'))
 async def start_registration(message: Message, state: FSMContext):
-    if await repository.get_user(message.from_user.id)[0]:
+    user = await repository.get_user(message.from_user.id)
+    if user:
         await message.answer('Вы уже зарегистрированы.')
         return
     await state.set_state(Registration.name)

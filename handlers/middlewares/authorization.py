@@ -24,7 +24,8 @@ class UserAuthorizationMiddleware(BaseMiddleware):
         elif event.callback_query:  
             user_id = event.callback_query.from_user.id
         
-        if not await repository.get_user(user_id)[0] and not event.message.text.startswith('/registration'):
+        user = await repository.get_user(user_id)
+        if not user and not event.message.text.startswith('/registration'):
             await event.message.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
             return
     

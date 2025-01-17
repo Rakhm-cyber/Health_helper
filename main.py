@@ -4,12 +4,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import BotCommand
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from handlers.handler import router
-from handlers.gigachat.gigachat_handler import gigachat_router
-
-from handlers.middlewares.action_logger import UserActionLoggerMiddleware
-from handlers.middlewares.authorization import UserAuthorizationMiddleware
-from handlers.middlewares.scheduler import SchedulerMiddleware
+from handlers import *
 
 from utils import config
 from database import repository
@@ -31,7 +26,7 @@ async def main():
     telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
 
     dispatcher = Dispatcher(storage=MemoryStorage())
-    scheduler = AsyncIOScheduler()
+    scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
 
     dispatcher.include_router(router)
     dispatcher.include_router(gigachat_router)
@@ -45,7 +40,7 @@ async def main():
     await set_commands(telegram_bot) 
 
     print("Бот запущен. Ожидаем сообщений...")
-    scheduler.start(timezone="Europe/Moscow")
+    scheduler.start()
 
     await dispatcher.start_polling(telegram_bot)
 
