@@ -35,7 +35,7 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
         await callback.message.answer("У вас нет данных за прошедшую неделю.")
         return
     
-    filepath = f"{callback.data}_{user_id}_{datetime.now()}.png"
+    filepath = f"{callback.data}_{user_id}_{datetime.now().date()}.png"
 
     plt.figure(figsize=(10, 6))
     plt.title(callback.data, fontsize=16)

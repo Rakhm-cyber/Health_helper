@@ -1,6 +1,7 @@
 from handlers.handler import router
 from database import repository
 from handlers import daily_survey
+from handlers import review
 
 from aiogram import Bot
 from aiogram.fsm.state import StatesGroup, State
@@ -125,8 +126,16 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
 
     scheduler.add_job(
         daily_survey.send_daily_survey,
-        #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)), 
+        #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
         'interval',
-        seconds=600,
+        seconds=600 ,
+        args=[callback.from_user.id, bot, state],
+    )
+
+    scheduler.add_job(
+        review.send_review_survey,
+        #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
+        'interval',
+        seconds=600 ,
         args=[callback.from_user.id, bot, state],
     )
