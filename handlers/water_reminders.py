@@ -54,6 +54,10 @@ async def water_remind(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
         job = scheduler.get_job(f"water_reminder_{user_id}")
         if job:
             job.remove()
+        
+        job = scheduler.get_job(f"daily_water_reminder_{user_id}")
+        if job:
+            job.remove()
 
         await message.answer("Уведомления отключены")
         return
