@@ -35,3 +35,12 @@ CREATE TABLE IF NOT EXISTS daily_survey (
     mood TEXT,
     sleep_quality TEXT
 );
+
+CREATE TABLE IF NOT EXISTS monthly_survey (
+    user_id BIGINT NOT NULL, 
+    survey_date DATE NOT NULL,
+    bot INTEGER,
+    support INTEGER,
+    updates INTEGER
+);
+

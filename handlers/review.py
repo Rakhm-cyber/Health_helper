@@ -37,14 +37,14 @@ async def step1(callback: CallbackQuery, state: FSMContext):
     await state.set_state(MonthflyServeyStates.month_question2)
 
 @router.callback_query(MonthflyServeyStates.month_question2)
-async def NAZVANIE(callback: CallbackQuery, state: FSMContext):
+async def step2(callback: CallbackQuery, state: FSMContext):
     answer = callback.data
     await state.update_data(mark2=answer)
     await callback.message.edit_text("Как вы оцениваете качество обновлений в этом месяце?", reply_markup=grades)
     await state.set_state(MonthflyServeyStates.month_question3)
 
 @router.callback_query(MonthflyServeyStates.month_question3)
-async def NAZVANIE(callback: CallbackQuery, state: FSMContext):
+async def step3(callback: CallbackQuery, state: FSMContext):
     answer = callback.data
     await state.update_data(mark3=answer)
     data = await state.get_data()
