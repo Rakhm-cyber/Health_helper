@@ -62,7 +62,7 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
     user_data = await repository.get_user(user_id)
     user_data = user_data[0]
 
-    recommendation = await weekly_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'], values)
+    recommendation = await weekly_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'], callback.data, values)
     await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
 
     
