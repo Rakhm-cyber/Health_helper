@@ -23,10 +23,8 @@ class Registration(StatesGroup):
 
 recommendation_keyboard = InlineKeyboardMarkup(
     inline_keyboard=[
-        [
-            InlineKeyboardButton(text="Рекомендации по физической нагрузке", callback_data="physical_recommendations"),
-            InlineKeyboardButton(text="Рекомендации по питанию", callback_data="nutrition_recommendations"),
-        ]
+        [InlineKeyboardButton(text="Рекомендации по физической нагрузке", callback_data="physical_recommendations")],
+        [InlineKeyboardButton(text="Рекомендации по питанию", callback_data="nutrition_recommendations")],
     ]
 )
 
