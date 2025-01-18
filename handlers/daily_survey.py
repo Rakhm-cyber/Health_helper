@@ -45,7 +45,7 @@ async def survey_physical_activity(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Очень высокий", callback_data="Очень высокий")],
         ]
     )
-    await callback.message.answer("Выберите уровень стресса:", reply_markup=buttons)
+    await callback.message.edit_reply_markup(reply_markup=buttons)
     await state.set_state(SurveyStates.stress_level)
 
 @router.callback_query(SurveyStates.stress_level)
@@ -63,7 +63,7 @@ async def survey_stress_level(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Очень хорошее", callback_data="Очень хорошее")],
         ]
     )
-    await callback.message.answer("Выберите настроение:", reply_markup=buttons)
+    await callback.message.edit_reply_markup(reply_markup=buttons)
     await state.set_state(SurveyStates.mood_level)
 
 @router.callback_query(SurveyStates.mood_level)
@@ -81,7 +81,7 @@ async def survey_mood_level(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text="Очень хорошее", callback_data="Очень хорошее")],
         ]
     )
-    await callback.message.answer("Выберите качество сна:", reply_markup=buttons)
+    await callback.message.edit_reply_markup(reply_markup=buttons)
     await state.set_state(SurveyStates.sleep_quality)
 
 @router.callback_query(SurveyStates.sleep_quality)
