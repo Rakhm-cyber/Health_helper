@@ -81,7 +81,11 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
     
     data = await state.get_data()
     start_time = data.get("start_time")
-    timezone = data.get("timezone")
+
+    user_data = await repository.get_user(message.from_user.id)
+    user_data = user_data[0]
+
+    timezone = user_data["timezone"]
 
     today = datetime.now(ZoneInfo(timezone))
     start_datetime = datetime.combine(today, start_time).replace(tzinfo=ZoneInfo(timezone))

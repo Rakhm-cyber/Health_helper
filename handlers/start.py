@@ -1,4 +1,5 @@
 from handlers.handler import router
+from database import repository
 
 from aiogram import types
 from aiogram.filters import CommandStart
@@ -71,8 +72,14 @@ main_keyboard = ReplyKeyboardMarkup(
 
 @router.message(CommandStart())
 async def start(message: Message):
-    await message.reply(
-        f"Привет.\nТвой ID: {message.from_user.id}\nИмя: {message.from_user.first_name}",
+    user = await repository.get_user(message.from_user.id)
+    if user:
+        user_name = user[0]['name']
+    else:
+        user_name = message.from_user.first_name
+    
+    await message.answer(
+        f"Привет, {user_name}!\nЯ помогу тебе поддерживать свое здоровье. Вот, что я могу:\n - Напоминать тебе всегда пить воду /water_remind\n - Каждый вечер я буду опрашивать тебя о твоем состоянии, чтобы в конце недели ты смог посмотреть как менялись твои уровни физ. активности, стресса, сна и настроения /report\n - Давать тебе рекоммендации по физической активности и питанию\n - Проводить викторину чтобы ты повышал свои знания о здоровом образе жизни\n- Просто отвечать на твои вопросы о здоровом образе жизни и давать советы!\n\n Но сначала зарегистрируйся, чтобы использовать весь мой функционал -> /registration",
         reply_markup = main_keyboard
     )
 

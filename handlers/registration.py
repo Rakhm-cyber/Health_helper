@@ -60,7 +60,7 @@ async def add_age(message: Message, state: FSMContext):
 
 @router.message(Registration.gender)
 async def add_gender(message: Message, state: FSMContext):
-    if message.text != "м" and message.text != "ж":
+    if message.text.lower() != "м" and message.text.lower() != "ж":
         await message.answer("Пожалуйста, введите свой пол корректно(м/ж)")
         return
     await state.update_data(gender=message.text)
@@ -116,7 +116,7 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         timezone=data.get("timezone")
     )
 
-    await callback.message.answer("Спасибо, регистрация завершена!\nТеперь каждый день вечером вам будет предложено пройти анкетирование для отслеживание вашего состояния.\nКаждую неделю вы сможете смотреть как менялось ваше эмоциональное состояние и уровень физической активности!")
+    await callback.message.answer(f"Приятно познакомиться, {data.get('name')}!\nТеперь каждый день вечером вам будет предложено пройти анкетирование для отслеживание вашего состояния.\nКаждую неделю вы сможете смотреть отчет и получать мою рецензию!")
     await callback.message.answer(
         "Выберите, что вас интересует:",
         reply_markup=recommendation_keyboard
@@ -127,6 +127,6 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         daily_survey.send_daily_survey,
         #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)), 
         'interval',
-        seconds=30,
+        seconds=600,
         args=[callback.from_user.id, bot, state],
     )
