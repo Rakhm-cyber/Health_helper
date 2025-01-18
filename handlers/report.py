@@ -37,16 +37,34 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
     
     filepath = f"{callback.data}_{user_id}_{datetime.now().date()}.png"
 
+    if callback.data == "physical_activity":
+        value_to_label = {
+            0: "Отсутствует",
+            1: "Лёгкая активность",
+            2: "Умеренная активность",
+            3: "Высокая активность"
+        }
+    else:
+        value_to_label = {
+            1: "Очень плохое",
+            2: "Плохое",
+            3: "Среднее",
+            4: "Хорошее",
+            5: "Очень хорошее"
+        }
+   
+    dates = [item['survey_date'] for item in data]
+    values = [item[callback.data] for item in data]
+
     plt.figure(figsize=(10, 6))
     plt.title(callback.data, fontsize=16)
     plt.xlabel("Дата", fontsize=12)
 
-    plt.gca().xaxis.set_major_locator(mdates.AutoDateLocator())  
-    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y')) 
+    plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y %H:%M')) 
 
-    dates = [item['survey_date'] for item in data]
-    values = [item[callback.data] for item in data]
-
+    plt.xticks(dates, [date.strftime('%d-%m-%Y %H:%M') for date in dates], rotation=45, fontsize=10)  # Метки по датам
+    plt.yticks(list(value_to_label.keys()), list(value_to_label.values()), fontsize=10)
+    
     plt.plot(dates, values, 'o-', color='blue', label=callback.data)
 
     plt.tight_layout()
@@ -54,6 +72,7 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
     plt.savefig(filepath)
 
     plt.close()
+
 
     photo = FSInputFile(filepath)
     await bot.send_photo(user_id, photo=photo)

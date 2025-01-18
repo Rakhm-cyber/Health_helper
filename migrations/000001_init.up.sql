@@ -29,11 +29,11 @@ CREATE TABLE IF NOT EXISTS user_drinked_water (
 
 CREATE TABLE IF NOT EXISTS daily_survey (
     user_id BIGINT NOT NULL, 
-    survey_date DATE NOT NULL,
-    physical_activity TEXT,
-    stress TEXT,
-    mood TEXT,
-    sleep_quality TEXT
+    survey_date TIMESTAMP NOT NULL,
+    physical_activity INTEGER,
+    stress INTEGER,
+    mood INTEGER,
+    sleep_quality INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS monthly_survey (

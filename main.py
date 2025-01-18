@@ -24,8 +24,7 @@ async def set_commands(bot: Bot):
 async def main():
     cfg = config.load()
 
-    #telegram_bot = Bot(token=cfg.telegram_token)
-    telegram_bot = Bot(token="7840531533:AAEM6R3xl_1HOOYJxvRiJEC1okwq5uF-Ius")
+    telegram_bot = Bot(token=cfg.telegram_token)
 
     dispatcher = Dispatcher(storage=MemoryStorage())
     scheduler = AsyncIOScheduler(timezone="Europe/Moscow")
