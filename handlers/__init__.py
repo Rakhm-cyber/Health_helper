@@ -5,6 +5,7 @@ from .recommendations import *
 from .registration import *
 from .start import *
 from .water_reminders import *
+from .report import *
 
 from .gigachat.gigachat_handler import *
 from .gigachat.gigachat_recomendations import *
