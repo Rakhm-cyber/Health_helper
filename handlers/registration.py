@@ -10,8 +10,10 @@ from aiogram.types import Message
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import CallbackQuery
+from zoneinfo import ZoneInfo 
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from apscheduler.triggers.cron import CronTrigger
 
 class Registration(StatesGroup):
     name = State()
@@ -128,14 +130,14 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         daily_survey.send_daily_survey,
         #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
         'interval',
-        seconds=600 ,
+        seconds=60,
         args=[callback.from_user.id, bot, state],
     )
 
     scheduler.add_job(
         review.send_review_survey,
-        #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
+        #trigger=CronTrigger(day=1, hour=20, minute=0, timezone=ZoneInfo(timezone))
         'interval',
-        seconds=30,
+        seconds=180,
         args=[callback.from_user.id, bot, state],
     )
