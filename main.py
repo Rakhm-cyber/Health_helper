@@ -15,7 +15,8 @@ async def set_commands(bot: Bot):
         BotCommand(command="/registration", description="Пройти регистрацию"),
         BotCommand(command="/edit", description="Подкорректируйте данные"),
         BotCommand(command="/profile", description="Ваши данные"),
-        BotCommand(command="/water_remind", description="Вкл/Выкл регулярные напоминания о питье воды")
+        BotCommand(command="/water_remind", description="Вкл/Выкл регулярные напоминания о питье воды"),
+        BotCommand(command="/report", description="Отчет о вашем состоянии")
     ]
     await bot.set_my_commands(commands)
 

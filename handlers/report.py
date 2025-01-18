@@ -1,5 +1,6 @@
 from handlers.handler import router
 from database import repository
+from handlers.gigachat.gigachat_weekly import weekly_recommendations
 
 import matplotlib.pyplot as plt
 from datetime import datetime
@@ -56,5 +57,12 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
 
     photo = FSInputFile(filepath)
     await bot.send_photo(user_id, photo=photo)
-    os.remove(filepath)   
+    os.remove(filepath)
+
+    user_data = await repository.get_user(user_id)
+    user_data = user_data[0]
+
+    recommendation = await weekly_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'], values)
+    await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
+
     

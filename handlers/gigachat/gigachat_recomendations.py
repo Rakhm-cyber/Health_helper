@@ -1,6 +1,6 @@
 from utils import config
 
-from langchain_core.messages import HumanMessage, SystemMessage
+from langchain_core.messages import HumanMessage
 from langchain_gigachat import GigaChat
 from langchain.prompts import PromptTemplate
 
