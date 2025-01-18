@@ -127,6 +127,6 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         daily_survey.send_daily_survey,
         #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)), 
         'interval',
-        seconds=30 ,
+        seconds=30,
         args=[callback.from_user.id, bot, state],
     )
