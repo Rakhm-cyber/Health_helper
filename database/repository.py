@@ -41,7 +41,7 @@ async def get_weight(user_id):
 
 async def add_water(user_id):
     current_day = datetime.now().date()
-    res = await get_water(db, user_id, current_day)
+    res = await get_water(user_id, current_day)
     if res:
         new_water_amount = res + 250
         await db.execute(
