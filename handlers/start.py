@@ -65,7 +65,7 @@ main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
         [KeyboardButton(text="Информация о проекте"), KeyboardButton(text="Викторина о здоровье")],
         [KeyboardButton(text="Поддержка"), KeyboardButton(text="Психологическая помощь")],
-        [KeyboardButton(text="Рекомендации по физической активности"), KeyboardButton(text="Рекомендации по питанию")],
+        [KeyboardButton(text="Рекомендации по физ. активности"), KeyboardButton(text="Рекомендации по питанию")],
     ],
     resize_keyboard=True,
     one_time_keyboard=True

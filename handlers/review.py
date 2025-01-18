@@ -48,7 +48,7 @@ async def step3(callback: CallbackQuery, state: FSMContext):
     answer = callback.data
     await state.update_data(mark3=answer)
     data = await state.get_data()
-    await callback.message.edit_text(f"Спасибо за участие в анкетировании! Ваши ответы: {data}")
+    await callback.message.edit_text(f"Спасибо за участие в анкетировании!")
     data = await state.get_data()
     data['survey_date'] = datetime.now().date()
     user_id = callback.from_user.id
