@@ -17,7 +17,6 @@ from apscheduler.triggers.cron import CronTrigger
 
 class Registration(StatesGroup):
     name = State()
-    mob_number = State()
     age = State()
     gender = State()
     height = State()
@@ -43,12 +42,6 @@ async def start_registration(message: Message, state: FSMContext):
 @router.message(Registration.name)
 async def add_name(message: Message, state: FSMContext):
     await state.update_data(name=message.text)
-    await state.set_state(Registration.mob_number)
-    await message.answer('Введите ваш номер телефона:')
-
-@router.message(Registration.mob_number)
-async def add_number(message: Message, state: FSMContext):
-    await state.update_data(mob_number=message.text)
     await state.set_state(Registration.age)
     await message.answer('Введите ваш возраст:')
 
@@ -111,7 +104,6 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
     await repository.add_user(
         user_id=callback.from_user.id,
         name=data.get("name"),
-        mob_number=data.get("mob_number"),
         age=int(data.get("age")),
         gender=data.get("gender"),
         height=int(data.get("height")),

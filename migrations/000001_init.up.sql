@@ -2,7 +2,6 @@ CREATE TABLE IF NOT EXISTS users (
     id serial PRIMARY KEY NOT NULL,
     user_id BIGINT NOT NULL,
     name TEXT NOT NULL,
-    mob_number TEXT NOT NULL,
     age INTEGER NOT NULL,
     gender TEXT NOT NULL,
     height INTEGER NOT NULL,

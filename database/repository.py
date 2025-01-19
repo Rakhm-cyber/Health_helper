@@ -16,12 +16,12 @@ async def update_parameter(user_id, field, value):
     query = f"UPDATE users SET {field} = $1 WHERE user_id = $2"
     await db.execute(query, value, user_id)
 
-async def add_user(user_id, name, mob_number, age, gender, height, weight, timezone):
+async def add_user(user_id, name, age, gender, height, weight, timezone):
     query = """
-    INSERT INTO users (user_id, name, mob_number, age, gender, height, weight, timezone)
-    VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    INSERT INTO users (user_id, name, age, gender, height, weight, timezone)
+    VALUES ($1, $2, $3, $4, $5, $6, $7)
     """
-    await db.execute(query, user_id, name, mob_number, age, gender, height, weight, timezone)
+    await db.execute(query, user_id, name, age, gender, height, weight, timezone)
 
 async def get_user(user_id):
     query = """

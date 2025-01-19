@@ -14,7 +14,7 @@ class UserAuthorizationMiddleware(BaseMiddleware):
         
         state = data.get('raw_state')
 
-        if state in [Registration.name.state, Registration.mob_number.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state, Registration.timezone.state]:
+        if state in [Registration.name.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state, Registration.timezone.state]:
             return await handler(event, data)
 
         user_id = 0
