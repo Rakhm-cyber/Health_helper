@@ -3,6 +3,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+        container_name: telegram_bot
         depends_on:
             postgres:
                 condition: service_healthy

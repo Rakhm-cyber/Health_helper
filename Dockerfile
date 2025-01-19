@@ -4,6 +4,7 @@ WORKDIR /bot
 
 COPY . .
 
-RUN pip install --no-cache-dir aiogram asyncpg python-dotenv
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["sh", "-c", "python /bot/main.py"]
+CMD ["python", "main.py"]
