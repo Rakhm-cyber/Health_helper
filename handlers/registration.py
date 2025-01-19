@@ -122,7 +122,7 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         daily_survey.send_daily_survey,
         #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
         'interval',
-        seconds=3000,
+        seconds=60,
         args=[callback.from_user.id, bot, state],
     )
 
@@ -130,6 +130,6 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         review.send_review_survey,
         #trigger=CronTrigger(day=1, hour=20, minute=0, timezone=ZoneInfo(timezone))
         'interval',
-        seconds=3000,
+        seconds=300,
         args=[callback.from_user.id, bot, state],
     )
