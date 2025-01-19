@@ -18,6 +18,17 @@ git clone git@github.com:Rakhm-cyber/Health_helper.git
 cd Health_helper
 ```
 Добавьте свою конфигурацию в .env файл
+```
+POSTGRES_PASSWORD=
+POSTGRES_USER=
+POSTGRES_DB=
+POSTGRES_HOST=postgres
+POSTGRES_PORT=5432
+
+TELEGRAM_TOKEN=""
+
+GIGACHAT_KEY=""
+```
 
 ```
 docker-compose up
