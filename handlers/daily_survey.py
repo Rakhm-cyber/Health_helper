@@ -107,4 +107,5 @@ async def survey_sleep_quality(callback: CallbackQuery, state: FSMContext):
     await repository.save_survey_data(user_id, data)
 
     await callback.message.edit_text("Спасибо за участие в анкетировании! Ваши ответы были сохранены.")
+    await callback.message.edit_reply_markup(reply_markup=None)
     await state.clear()
