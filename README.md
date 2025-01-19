@@ -17,7 +17,7 @@
 git clone git@github.com:Rakhm-cyber/Health_helper.git
 cd Health_helper
 ```
-Добавьте свою конфигурацию в .env файле
+Добавьте свою конфигурацию в .env файл
 
 ```
 docker-compose up
