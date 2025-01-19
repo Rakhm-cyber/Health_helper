@@ -59,7 +59,6 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
 
     plt.close()
 
-
     photo = FSInputFile(filepath)
     await bot.send_photo(user_id, photo=photo)
     os.remove(filepath)

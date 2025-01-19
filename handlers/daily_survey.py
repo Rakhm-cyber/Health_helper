@@ -6,6 +6,7 @@ from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import CallbackQuery
+import asyncio
 
 from datetime import datetime
 
@@ -16,20 +17,31 @@ class SurveyStates(StatesGroup):
     sleep_quality = State()
     additional_notes = State()
 
+
 async def send_daily_survey(user_id, bot: Bot, state: FSMContext):
-    await bot.send_message(user_id, "Привет! Пора пройти ежедневное анкетирование.")
+    interval = 30 
 
-    buttons = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [InlineKeyboardButton(text="Нет физической активности", callback_data="0:Нет")],
-            [InlineKeyboardButton(text="Лёгкая активность", callback_data="1:Легкая")],
-            [InlineKeyboardButton(text="Умеренная активность", callback_data="2:Умеренная")],
-            [InlineKeyboardButton(text="Высокая активность", callback_data="3:Высокая")],
-        ]
-    )
-    await bot.send_message(user_id, "Какой у вас уровень физической активности сегодня?", reply_markup=buttons)
-    await state.set_state(SurveyStates.physical_activity)
+    while True:
+        current_state = await state.get_state()
+        
+        if current_state is None:
+            await bot.send_message(user_id, "Привет! Пора пройти ежедневное анкетирование.")
+            
+            buttons = InlineKeyboardMarkup(
+                inline_keyboard=[
+                    [InlineKeyboardButton(text="Нет физической активности", callback_data="0:Нет")],
+                    [InlineKeyboardButton(text="Лёгкая активность", callback_data="1:Легкая")],
+                    [InlineKeyboardButton(text="Умеренная активность", callback_data="2:Умеренная")],
+                    [InlineKeyboardButton(text="Высокая активность", callback_data="3:Высокая")],
+                ]
+            )
+            await bot.send_message(user_id, "Какой у вас уровень физической активности сегодня?", reply_markup=buttons)
 
+            await state.set_state(SurveyStates.physical_activity)
+            return 
+
+        await asyncio.sleep(interval) 
+        
 @router.callback_query(SurveyStates.physical_activity)
 async def survey_physical_activity(callback: CallbackQuery, state: FSMContext):
     answer = callback.data
