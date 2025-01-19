@@ -4,6 +4,8 @@
 - Рахматуллиным Айгизом.
 
 # Блок-схема
+[Посмотреть блок-схему](https://app.diagrams.net/#G1BvQ6Wy99I2UXjhuDjQRyIksZYEocSR0B#%7B"pageId"%3A"HQK9jq8fUNQI8AnmLcfA"%7D)
+
 ![scheme](diagram.png)
 
 
