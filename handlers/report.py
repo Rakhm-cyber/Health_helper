@@ -48,7 +48,7 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
 
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y %H:%M')) 
 
-    plt.xticks(dates, [date.strftime('%d-%m-%Y %H:%M') for date in dates], rotation=45, fontsize=10)  # Метки по датам
+    plt.xticks(dates, [date.strftime('%d-%m-%Y %H:%M') for date in dates], rotation=45, fontsize=10) 
     plt.yticks(list(values.keys()), list(values.values()), fontsize=10)
     
     plt.plot(dates, values.keys(), 'o-', color='blue', label=callback.data)
