@@ -44,7 +44,7 @@ async def add_name(message: Message, state: FSMContext):
     if not message.text.isalpha():
         await message.answer("Пожалуйста, введите имя буквами.")
         return
-    if  len(message.text.isalpha()) > 20:
+    if  len(message.text) > 20:
         await message.answer("Имя слишком длинное.")
         return
 
