@@ -4,7 +4,14 @@ WORKDIR /bot
 
 COPY . .
 
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install pyinstaller && pip install --no-cache-dir -r requirements.txt && pyinstaller --onefile main.py
 
-CMD ["python", "main.py"]
+FROM alpine:latest
+
+RUN apk --no-cache add ca-certificates
+
+WORKDIR /root/
+
+COPY --from=build /build/dist/main .
+
+CMD ["./main"]
