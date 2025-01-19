@@ -21,15 +21,14 @@ class UserAuthorizationMiddleware(BaseMiddleware):
 
         if event.message:  
             user_id = event.message.from_user.id
+            if not event.message.text:
+                await data['bot'].send_message(user_id, "Я могу отвечать только на текст!")
+                return
         elif event.callback_query:  
             user_id = event.callback_query.from_user.id
         
         user = await repository.get_user(user_id)
 
-        if event.message.content_type != "text": 
-            event.message.answer("Я могу отвечать только на текстовые сообщения!")
-            return
-        
         if not user and not event.message.text.startswith('/registration') and not event.message.text.startswith('/start'):
             await event.message.answer("Вы не зарегистрированы. Пожалуйста, зарегистрируйтесь, чтобы использовать бота.")
             return
