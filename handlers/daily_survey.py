@@ -21,10 +21,10 @@ async def send_daily_survey(user_id, bot: Bot, state: FSMContext):
 
     buttons = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Нет физической активности", callback_data="0")],
-            [InlineKeyboardButton(text="Лёгкая активность", callback_data="1")],
-            [InlineKeyboardButton(text="Умеренная активность", callback_data="2")],
-            [InlineKeyboardButton(text="Высокая активность", callback_data="3")],
+            [InlineKeyboardButton(text="Нет физической активности", callback_data="0:Нет")],
+            [InlineKeyboardButton(text="Лёгкая активность", callback_data="1:Легкая")],
+            [InlineKeyboardButton(text="Умеренная активность", callback_data="2:Умеренная")],
+            [InlineKeyboardButton(text="Высокая активность", callback_data="3:Высокая")],
         ]
     )
     await bot.send_message(user_id, "Какой у вас уровень физической активности сегодня?", reply_markup=buttons)
@@ -38,11 +38,11 @@ async def survey_physical_activity(callback: CallbackQuery, state: FSMContext):
 
     buttons = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Очень низкий", callback_data="1")],
-            [InlineKeyboardButton(text="Низкий", callback_data="2")],
-            [InlineKeyboardButton(text="Средний", callback_data="3")],
-            [InlineKeyboardButton(text="Высокий", callback_data="4")],
-            [InlineKeyboardButton(text="Очень высокий", callback_data="5")],
+            [InlineKeyboardButton(text="Очень низкий", callback_data="1:Очень низкий")],
+            [InlineKeyboardButton(text="Низкий", callback_data="2:Низкий")],
+            [InlineKeyboardButton(text="Средний", callback_data="3:Средний")],
+            [InlineKeyboardButton(text="Высокий", callback_data="4:Высокий")],
+            [InlineKeyboardButton(text="Очень высокий", callback_data="5:Очень высокий")],
         ]
     )
     await callback.message.edit_reply_markup(reply_markup=buttons)
@@ -56,11 +56,11 @@ async def survey_stress_level(callback: CallbackQuery, state: FSMContext):
 
     buttons = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Очень плохое", callback_data="1")],
-            [InlineKeyboardButton(text="Плохое", callback_data="2")],
-            [InlineKeyboardButton(text="Среднее", callback_data="3")],
-            [InlineKeyboardButton(text="Хорошее", callback_data="4")],
-            [InlineKeyboardButton(text="Очень хорошее", callback_data="5")],
+            [InlineKeyboardButton(text="Очень плохое", callback_data="1:Очень плохое")],
+            [InlineKeyboardButton(text="Плохое", callback_data="2:Плохое")],
+            [InlineKeyboardButton(text="Среднее", callback_data="3:Среднее")],
+            [InlineKeyboardButton(text="Хорошее", callback_data="4:Хорошее")],
+            [InlineKeyboardButton(text="Очень хорошее", callback_data="5:Очень хорошее")],
         ]
     )
     await callback.message.edit_reply_markup(reply_markup=buttons)
@@ -74,11 +74,11 @@ async def survey_mood_level(callback: CallbackQuery, state: FSMContext):
 
     buttons = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Очень плохое", callback_data="1")],
-            [InlineKeyboardButton(text="Плохое", callback_data="2")],
-            [InlineKeyboardButton(text="Среднее", callback_data="3")],
-            [InlineKeyboardButton(text="Хорошее", callback_data="4")],
-            [InlineKeyboardButton(text="Очень хорошее", callback_data="5")],
+            [InlineKeyboardButton(text="Очень плохое", callback_data="1:Очень плохое")],
+            [InlineKeyboardButton(text="Плохое", callback_data="2:Плохое")],
+            [InlineKeyboardButton(text="Среднее", callback_data="3:Среднее")],
+            [InlineKeyboardButton(text="Хорошее", callback_data="4:Хорошее")],
+            [InlineKeyboardButton(text="Очень хорошее", callback_data="5:Очень хорошее")],
         ]
     )
     await callback.message.edit_reply_markup(reply_markup=buttons)

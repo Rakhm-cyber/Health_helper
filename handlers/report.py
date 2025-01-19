@@ -36,25 +36,11 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
         return
     
     filepath = f"{callback.data}_{user_id}_{datetime.now().date()}.png"
-
-    if callback.data == "physical_activity":
-        value_to_label = {
-            0: "Отсутствует",
-            1: "Лёгкая активность",
-            2: "Умеренная активность",
-            3: "Высокая активность"
-        }
-    else:
-        value_to_label = {
-            1: "Очень плохое",
-            2: "Плохое",
-            3: "Среднее",
-            4: "Хорошее",
-            5: "Очень хорошее"
-        }
    
     dates = [item['survey_date'] for item in data]
-    values = [item[callback.data] for item in data]
+    raw_values = [item[callback.data] for item in data]
+     
+    values = {int(item.split(":")[0]): item.split(":")[1] for item in raw_values}
 
     plt.figure(figsize=(10, 6))
     plt.title(callback.data, fontsize=16)
@@ -63,9 +49,9 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
     plt.gca().xaxis.set_major_formatter(mdates.DateFormatter('%d-%m-%Y %H:%M')) 
 
     plt.xticks(dates, [date.strftime('%d-%m-%Y %H:%M') for date in dates], rotation=45, fontsize=10)  # Метки по датам
-    plt.yticks(list(value_to_label.keys()), list(value_to_label.values()), fontsize=10)
+    plt.yticks(list(values.keys()), list(values.values()), fontsize=10)
     
-    plt.plot(dates, values, 'o-', color='blue', label=callback.data)
+    plt.plot(dates, values.keys(), 'o-', color='blue', label=callback.data)
 
     plt.tight_layout()
 
@@ -81,7 +67,7 @@ async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContex
     user_data = await repository.get_user(user_id)
     user_data = user_data[0]
 
-    recommendation = await weekly_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'], callback.data, values)
+    recommendation = await weekly_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'], callback.data, raw_values)
     await callback.message.answer(f"{recommendation}", parse_mode="Markdown")
 
     
