@@ -13,7 +13,7 @@ from aiogram.types import CallbackQuery
 from zoneinfo import ZoneInfo 
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
 
 class Registration(StatesGroup):
     name = State()
@@ -122,14 +122,16 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         daily_survey.send_daily_survey,
         #trigger=DailyTrigger(hour=20, minute=0, second=0, timezone=ZoneInfo(timezone)),
         'interval',
-        seconds=60,
+        seconds=20,
         args=[callback.from_user.id, bot, state],
+        max_instances=None
     )
 
     scheduler.add_job(
         review.send_review_survey,
-        #trigger=CronTrigger(day=1, hour=20, minute=0, timezone=ZoneInfo(timezone))
+        #trigger=IntervalTrigger(days=30)
         'interval',
-        seconds=300,
+        seconds=20,
         args=[callback.from_user.id, bot, state],
+        max_instances=None
     )

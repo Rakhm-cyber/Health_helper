@@ -8,6 +8,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.types import CallbackQuery
 
 from datetime import datetime
+import asyncio
 
 class MonthflyServeyStates(StatesGroup):
     month_question1 = State()
@@ -25,9 +26,18 @@ grades = InlineKeyboardMarkup(
 )
 
 async def send_review_survey(user_id, bot: Bot, state: FSMContext):
-    await bot.send_message(user_id, "Привет! Поучаствуй в ежемесячном опросе о работе бота.")
-    await bot.send_message(user_id, "Как вы оцените работу бота в этом месяце?", reply_markup=grades)
-    await state.set_state(MonthflyServeyStates.month_question1)
+    interval = 30  
+
+    while True:
+        current_state = await state.get_state()
+
+        if current_state is None:
+            await bot.send_message(user_id, "Привет! Поучаствуй в ежемесячном опросе о работе бота.")
+            await bot.send_message(user_id, "Как вы оцените работу бота в этом месяце?", reply_markup=grades)
+            await state.set_state(MonthflyServeyStates.month_question1)
+            return 
+
+        await asyncio.sleep(interval)  
 
 @router.callback_query(MonthflyServeyStates.month_question1)
 async def step1(callback: CallbackQuery, state: FSMContext):
