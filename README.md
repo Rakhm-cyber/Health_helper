@@ -14,7 +14,7 @@
 
 ## Для разработчиков
 ```
-git clone git@github.com:Rakhm-cyber/Health_helper.git
+git clone https://github.com/chudik63/Health_helper.git
 cd Health_helper
 ```
 Добавьте свою конфигурацию в .env файл
