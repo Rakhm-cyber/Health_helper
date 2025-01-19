@@ -1,17 +1,10 @@
-FROM python:3.11 AS build
+FROM python:3.11
 
 WORKDIR /bot
 
 COPY . .
 
-RUN pip install pyinstaller && pip install --no-cache-dir -r requirements.txt && pyinstaller --onefile main.py
+RUN pip install --no-cache-dir --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
-FROM alpine:latest
-
-RUN apk --no-cache add ca-certificates
-
-WORKDIR /root/
-
-COPY --from=build /build/dist/main .
-
-CMD ["./main"]
+CMD ["python", "main.py"]
