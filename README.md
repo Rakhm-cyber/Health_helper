@@ -8,4 +8,15 @@
 
 ![scheme](diagram.png)
 
+# Как запустить
+## Telegram bot
+@HealthHelper_MIEM_bot
+
+## Для разработчиков
+```
+git clone git@github.com:Rakhm-cyber/Health_helper.git
+cd Health_helper
+docker-compose up
+```
+
 
