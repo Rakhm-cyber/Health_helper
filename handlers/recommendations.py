@@ -39,7 +39,7 @@ async def nutrition_recommendations_button(message: Message):
     recommendation = await nutrition_recommendations(user_data['age'], user_data['gender'], user_data['height'], user_data['weight'])
     await message.answer(f"{recommendation}", parse_mode="Markdown")
 
-@ButtomRouter.message(lambda message: message.text == "Рекомендации по физической активности")
+@ButtomRouter.message(lambda message: message.text == "Рекомендации по физ. активности")
 async def nutrition_recommendations_button(message: Message):
     user_id = message.from_user.id
     user_data = await repository.get_user(user_id)
