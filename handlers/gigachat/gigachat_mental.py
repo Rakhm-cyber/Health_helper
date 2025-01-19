@@ -119,4 +119,5 @@ async def fourth_question(message: Message, state: FSMContext):
         answer4=data.get("answer4"),
         answer5=data.get("answer5")
     )
+    await state.clear()
     await message.answer(recommendations)

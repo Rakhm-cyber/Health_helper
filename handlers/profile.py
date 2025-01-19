@@ -37,7 +37,6 @@ async def show_profile(message: Message):
     profile_text = (
         f"Ваш профиль:\n"
         f"Имя: {user_data['name'] or 'Не указано'}\n"
-        f"Номер телефона: {user_data['mob_number'] or 'Не указано'}\n"
         f"Возраст: {user_data['age'] or 'Не указано'}\n"
         f"Пол: {user_data['gender'] or 'Не указано'}\n"
         f"Рост: {user_data['height'] or 'Не указано'}\n"
