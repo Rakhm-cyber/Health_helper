@@ -11,12 +11,6 @@ services:
                 condition: service_completed_successfully
         networks:
             - bot
-        deploy:
-            resources:
-                limits:
-                    memory: 512M
-            reservations:
-                memory: 256M
 
     postgres:
         image: postgres:latest
