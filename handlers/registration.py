@@ -41,6 +41,13 @@ async def start_registration(message: Message, state: FSMContext):
 
 @router.message(Registration.name)
 async def add_name(message: Message, state: FSMContext):
+    if not message.text.isalpha():
+        await message.answer("Пожалуйста, введите имя буквами.")
+        return
+    if  len(message.text.isalpha()) > 20:
+        await message.answer("Имя слишком длинное.")
+        return
+
     await state.update_data(name=message.text)
     await state.set_state(Registration.age)
     await message.answer('Введите ваш возраст:')
@@ -68,6 +75,9 @@ async def add_height(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный рост (число).")
         return
+    if int(message.text) >= 250:
+        await message.answer("Пожалуйста, введите ваш настоящий рост.")
+        return
     await state.update_data(height=message.text)
     await state.set_state(Registration.weight)
     await message.answer('Введите ваш вес:')
@@ -76,6 +86,9 @@ async def add_height(message: Message, state: FSMContext):
 async def ad_weight(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный вес (число).")
+        return
+    if int(message.text) >= 500:
+        await message.answer("Пожалуйста, введите ваш настоящий вес.")
         return
 
     await state.update_data(weight=message.text)

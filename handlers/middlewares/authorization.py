@@ -14,9 +14,6 @@ class UserAuthorizationMiddleware(BaseMiddleware):
         
         state = data.get('raw_state')
 
-        if state in [Registration.name.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state, Registration.timezone.state]:
-            return await handler(event, data)
-
         user_id = 0
 
         if event.message:  
@@ -26,6 +23,10 @@ class UserAuthorizationMiddleware(BaseMiddleware):
                 return
         elif event.callback_query:  
             user_id = event.callback_query.from_user.id
+
+        if state in [Registration.name.state, Registration.age.state, Registration.gender.state, Registration.height.state, Registration.weight.state, Registration.timezone.state]:
+            return await handler(event, data)
+
         
         user = await repository.get_user(user_id)
 
