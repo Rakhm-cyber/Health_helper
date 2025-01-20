@@ -26,7 +26,7 @@ async def start_registration(message: Message, state: FSMContext):
     )
     await message.answer('Отчет о вашем состоянии за прошедшую неделю. Выберите интересующий вас пункт:', reply_markup=report_keyboard)
 
-@router.callback_query(lambda c: c.data.startswith("report_"))
+@router.callback_query(lambda c: c.data.startswith("report-"))
 async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContext):
     user_id = callback.from_user.id
 
