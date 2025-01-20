@@ -113,6 +113,7 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
     await callback.message.edit_reply_markup(reply_markup=None)
 
     data = await state.get_data()
+    await state.clear()
 
     await repository.add_user(
         user_id=callback.from_user.id,
@@ -129,7 +130,7 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         "Выберите, что вас интересует:",
         reply_markup=recommendation_keyboard
     )
-    await state.clear()
+
 
     scheduler.add_job(
         daily_survey.send_daily_survey,

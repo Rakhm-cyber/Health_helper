@@ -84,6 +84,8 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
         return
     
     data = await state.get_data()
+    await state.clear()
+    
     start_time = data.get("start_time")
 
     user_data = await repository.get_user(message.from_user.id)
@@ -141,8 +143,6 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
     await message.answer(
         f"Теперь я буду напоминать вам каждые {interval} {time_unit} пить воду с {start_time} до {end_time} в вашем часовом поясе ({timezone})!"
     )
-
-    await state.clear()
 
     daily_water_count_reminder = f"daily_water_reminder_{user_id}"
 

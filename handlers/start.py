@@ -92,6 +92,7 @@ async def start(message: Message, state: FSMContext):
 @router.message(lambda message: message.text == "Информация о проекте")
 async def handle_project_info(message: types.Message, state: FSMContext):
     if state:
+        await message.answer("В данный момент невозможно")
         return
 
     await message.answer(
@@ -108,6 +109,7 @@ async def handle_project_info(message: types.Message, state: FSMContext):
 @router.message(lambda message: message.text == "Поддержка")
 async def handle_support(message: types.Message, state: FSMContext):
     if state:
+        await message.answer("В данный момент невозможно")
         return
 
     await message.answer(

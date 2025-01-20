@@ -104,11 +104,11 @@ async def update_weight(message: Message, state: FSMContext):
     if not message.text.isdigit() or int(message.text) <= 0:
         await message.answer("Пожалуйста, введите корректный вес (число).")
         return
-
+        
+    await state.clear()
     new_weight = int(message.text)
     user_id = message.from_user.id
 
     await repository.update_parameter(user_id, "weight", new_weight)
 
     await message.answer("Ваш вес успешно обновлён.")
-    await state.clear()
