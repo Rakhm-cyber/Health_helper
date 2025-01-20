@@ -78,6 +78,9 @@ async def physical_activity_recommendations(answer1, answer2, amswer3, answer4, 
 
 @quiz_router.message(lambda message: message.text == "Психологическая помощь")
 async def first_question(message: Message, state: FSMContext):
+    if state:
+        return
+        
     await state.set_state(Mental.question1)
     await message.answer("Тебе предстоит ответить на несколько моих вопросов! Старайся отвечать развернуто! Вот первый вопрос: Как ты себя чувствуешь сегодня на эмоциональном уровне?")
 

@@ -152,8 +152,6 @@ async def set_end_time(message: Message, bot: Bot, scheduler: AsyncIOScheduler, 
         args=[user_id, bot], 
         id=daily_water_count_reminder
     )
-    
-
 
 @router.callback_query(lambda c: c.data == "drink_water")
 async def disable_reminders(callback_query: CallbackQuery, bot: Bot, scheduler: AsyncIOScheduler):

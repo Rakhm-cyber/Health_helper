@@ -144,7 +144,7 @@ async def add_timezone(callback: CallbackQuery, bot: Bot, scheduler: AsyncIOSche
         review.send_review_survey,
         #trigger=IntervalTrigger(days=30)
         'interval',
-        seconds=300,
+        seconds=600,
         args=[callback.from_user.id, bot, state],
         max_instances=10
     )

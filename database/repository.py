@@ -72,7 +72,7 @@ async def save_monthly_servey_data(user_id, data):
     INSERT INTO monthly_survey (user_id, survey_date, bot, support, updates)
     VALUES ($1, $2, $3, $4, $5)
     """
-    await db.execute(query, user_id, data['survey_date'], data['mark1'], data['mark2'], data['mark3'])
+    await db.execute(query, user_id, data['survey_date'], int(data['mark1']), int(data['mark2']), int(data['mark3']))
 
 async def get_weekly_survey_data(user_id, field):
     query = f"""

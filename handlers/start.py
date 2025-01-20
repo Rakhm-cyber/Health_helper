@@ -2,11 +2,16 @@ from handlers.handler import router
 from database import repository
 
 from aiogram import types
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.types import Message
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.context import FSMContext
 
 user_states = {}
+
+class QuizState(StatesGroup):
+    in_quiz = State()
 
 quiz_data = [
     {
@@ -63,7 +68,7 @@ quiz_data = [
 
 main_keyboard = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text="Информация о проекте"), KeyboardButton(text="Викторина о здоровье")],
+        [KeyboardButton(text="Информация о проекте")],
         [KeyboardButton(text="Поддержка"), KeyboardButton(text="Психологическая помощь")],
         [KeyboardButton(text="Рекомендации по физ. активности"), KeyboardButton(text="Рекомендации по питанию")],
     ],
@@ -72,7 +77,7 @@ main_keyboard = ReplyKeyboardMarkup(
 )
 
 @router.message(CommandStart())
-async def start(message: Message):
+async def start(message: Message, state: FSMContext):
     user = await repository.get_user(message.from_user.id)
     if user:
         user_name = user[0]['name']
@@ -80,12 +85,15 @@ async def start(message: Message):
         user_name = message.from_user.first_name
     
     await message.answer(
-        f"Привет, {user_name}!\nЯ помогу тебе поддерживать свое здоровье. Вот, что я могу:\n - Напоминать тебе всегда пить воду /water_remind\n - Каждый вечер я буду опрашивать тебя о твоем состоянии, чтобы в конце недели ты смог посмотреть как менялись твои уровни физ. активности, стресса, сна и настроения /report\n - Давать тебе рекоммендации по физической активности и питанию\n - Проводить викторину чтобы ты повышал свои знания о здоровом образе жизни\n - Оказывать психологическую поддержку\n - Просто отвечать на твои вопросы о здоровом образе жизни и давать советы!\n\n Но сначала зарегистрируйся, чтобы использовать весь мой функционал -> /registration",
+        f"Привет, {user_name}!\nЯ помогу тебе поддерживать свое здоровье. Вот, что я могу:\n - Напоминать тебе всегда пить воду /water_remind\n - Каждый вечер я буду опрашивать тебя о твоем состоянии, чтобы в конце недели ты смог посмотреть как менялись твои уровни физ. активности, стресса, сна и настроения /report\n - Давать тебе рекоммендации по физической активности и питанию\n - Проводить викторину чтобы ты повышал свои знания о здоровом образе жизни /quiz\n - Оказывать психологическую поддержку\n - Просто отвечать на твои вопросы о здоровом образе жизни и давать советы!\n\n Но сначала зарегистрируйся, чтобы использовать весь мой функционал -> /registration",
         reply_markup = main_keyboard
     )
 
 @router.message(lambda message: message.text == "Информация о проекте")
-async def handle_project_info(message: types.Message):
+async def handle_project_info(message: types.Message, state: FSMContext):
+    if state:
+        return
+
     await message.answer(
         "Информация о проекте:\n"
         "Этот бот создан для помощи людям в поддержке личного здоровья.\n"
@@ -98,7 +106,10 @@ async def handle_project_info(message: types.Message):
 
 
 @router.message(lambda message: message.text == "Поддержка")
-async def handle_support(message: types.Message):
+async def handle_support(message: types.Message, state: FSMContext):
+    if state:
+        return
+
     await message.answer(
         "Свяжитесь с разработчиком:\n"
         "[Написать в Telegram (1)](https://t.me/neeeeectdis)\n"
@@ -107,11 +118,13 @@ async def handle_support(message: types.Message):
     )
 
 
-@router.message(lambda message: message.text == "Викторина о здоровье")
-async def start_quiz(message: types.Message):
+@router.message(Command("quiz"))
+async def start_quiz(message: types.Message, state: FSMContext):
     user_states[message.from_user.id] = 0
     question_index = user_states[message.from_user.id]
     question_data = quiz_data[question_index]
+
+    await state.set_state(QuizState.in_quiz)
 
     await message.answer(
         question_data["question"],
@@ -126,7 +139,7 @@ def generate_quiz_keyboard(question_index: int):
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
 @router.callback_query(lambda callback: callback.data.startswith("quiz_"))
-async def handle_quiz_answer(callback_query: types.CallbackQuery):
+async def handle_quiz_answer(callback_query: types.CallbackQuery, state: FSMContext):
     _, question_index, option_index = callback_query.data.split("_")
     question_index = int(question_index)
     option_index = int(option_index)
@@ -151,6 +164,7 @@ async def handle_quiz_answer(callback_query: types.CallbackQuery):
             reply_markup=generate_quiz_keyboard(next_question_index)
         )
     else:
+        await state.clear()
         await callback_query.message.answer("Вы завершили викторину! 🎉")
 
     await callback_query.answer()
