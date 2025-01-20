@@ -30,7 +30,7 @@ async def start_registration(message: Message, state: FSMContext):
 async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContext):
     user_id = callback.from_user.id
 
-    req = callback.data.split("_")
+    req = callback.data.split("_")[1]
 
     data = await repository.get_weekly_survey_data(user_id, req)
     if not data:
