@@ -25,6 +25,8 @@ async def send_daily_survey(user_id, bot: Bot, state: FSMContext):
         current_state = await state.get_state()
         
         if current_state is None:
+            await state.set_state(SurveyStates.physical_activity)
+
             await bot.send_message(user_id, "Привет! Пора пройти ежедневное анкетирование.")
             
             buttons = InlineKeyboardMarkup(
@@ -37,7 +39,6 @@ async def send_daily_survey(user_id, bot: Bot, state: FSMContext):
             )
             await bot.send_message(user_id, "Какой у вас уровень физической активности сегодня?", reply_markup=buttons)
 
-            await state.set_state(SurveyStates.physical_activity)
             return 
 
         await asyncio.sleep(interval) 
