@@ -18,10 +18,10 @@ from aiogram.types import CallbackQuery
 async def start_registration(message: Message, state: FSMContext):
     report_keyboard = InlineKeyboardMarkup(
         inline_keyboard=[
-            [InlineKeyboardButton(text="Уровень физической активности", callback_data="report_physical-activity")],
-            [InlineKeyboardButton(text="Уровень стресса", callback_data="report_stress")],
-            [InlineKeyboardButton(text="Ваше настроение", callback_data="report_mood")],
-            [InlineKeyboardButton(text="Качество сна", callback_data="report_sleep-quality")],
+            [InlineKeyboardButton(text="Уровень физической активности", callback_data="report-physical_activity")],
+            [InlineKeyboardButton(text="Уровень стресса", callback_data="report-stress")],
+            [InlineKeyboardButton(text="Ваше настроение", callback_data="report-mood")],
+            [InlineKeyboardButton(text="Качество сна", callback_data="report-sleep_quality")],
         ]
     )
     await message.answer('Отчет о вашем состоянии за прошедшую неделю. Выберите интересующий вас пункт:', reply_markup=report_keyboard)
@@ -30,7 +30,7 @@ async def start_registration(message: Message, state: FSMContext):
 async def plot_weekly_report(callback: CallbackQuery, bot: Bot, state: FSMContext):
     user_id = callback.from_user.id
 
-    req = callback.data.split("_")[1]
+    req = callback.data.split("-")[1]
 
     data = await repository.get_weekly_survey_data(user_id, req)
     if not data:
