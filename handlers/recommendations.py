@@ -9,8 +9,8 @@ from handlers.gigachat.gigachat_recomendations import physical_activity_recommen
 
 @router.callback_query(lambda c: c.data == "physical_recommendations")
 async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
-    if state:
-        await message.answer("В данный момент невозможно")
+    if await state.get_state():
+        await callback.answer("В данный момент невозможно", show_alert=True)
         return
 
     user_id = callback.from_user.id
@@ -25,8 +25,8 @@ async def physical_recommendations(callback: CallbackQuery, state: FSMContext):
 
 @router.callback_query(lambda c: c.data == "nutrition_recommendations")
 async def nutrition_recommendations_h(callback: CallbackQuery, state: FSMContext):
-    if state:
-        await message.answer("В данный момент невозможно")
+    if await state.get_state():
+        await callback.answer("В данный момент невозможно", show_alert=True)
         return
 
     user_id = callback.from_user.id
@@ -41,8 +41,7 @@ async def nutrition_recommendations_h(callback: CallbackQuery, state: FSMContext
 ButtomRouter = Router()
 @ButtomRouter.message(lambda message: message.text == "Рекомендации по питанию")
 async def nutrition_recommendations_button(message: Message, state: FSMContext):
-    if state:
-        await message.answer("В данный момент невозможно")
+    if await state.get_state():
         return
 
     user_id = message.from_user.id
@@ -53,10 +52,9 @@ async def nutrition_recommendations_button(message: Message, state: FSMContext):
 
 @ButtomRouter.message(lambda message: message.text == "Рекомендации по физ. активности")
 async def nutrition_recommendations_button(message: Message, state: FSMContext):
-    if state:
-        await message.answer("В данный момент невозможно")
+    if await state.get_state():
         return
-        
+
     user_id = message.from_user.id
     user_data = await repository.get_user(user_id)
     user_data = user_data[0]
